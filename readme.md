@@ -4,7 +4,7 @@
 Arduino code is at the top level. For other files, see the directory `.other`, in which the following can be found:
 
 - `docs/system_architecture`: documentation regarding the structure of the code
-- `src/java.sim.nocompile/*`: java code for the OR simulator at (`MDNich/ActiveControl_MIT_RktTeam`)[https://github.com/MDNich/ActiveControl_MIT_RktTeam]. It will not compile in this repository, and it is purely for reference purposes.
+- `src/java.sim.nocompile/*`: java code for the OR simulator at [`MDNich/ActiveControl_MIT_RktTeam`](https://github.com/MDNich/ActiveControl_MIT_RktTeam). It will not compile in this repository, and it is purely for reference purposes.
 
 
 ## **GPS library**
