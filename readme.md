@@ -7,44 +7,48 @@ Arduino code is at the top level. For other files, see the directory `.other`, i
 - `src/java.sim.nocompile/*`: java code for the OR simulator at [`MDNich/ActiveControl_MIT_RktTeam`](https://github.com/MDNich/ActiveControl_MIT_RktTeam). It will not compile in this repository, and it is purely for reference purposes.
 
 
-## **GPS library**
+See [this diagram](https://github.com/MIT-Rocket-Team/RT_Firmware_Libs/blob/master/.other/docs/system_architecture/UML_FC_sim.pdf) for an overview of the simulation clases (updated continually).
 
-### `GPS(HardwareSerial* gpsSer)`
+## Arduino Libraries
+
+### GPS library
+
+#### `GPS(HardwareSerial* gpsSer)`
 constructor
-### `void setup()`
+#### `void setup()`
 begins serial port
-### `void updateAndParse()`
+#### `void updateAndParse()`
 moves any available serial data into the data buffer, and if any data is available, parses the buffer
-### `float getPDOP()`
+#### `float getPDOP()`
 returns PDOP
-### `float getVDOP()`
+#### `float getVDOP()`
 returns VDOP
-### `float getHDOP()`
+#### `float getHDOP()`
 returns HDOP
-### `float getLatitude()`
+#### `float getLatitude()`
 returns latitude
-### `float getLongitude()`
+#### `float getLongitude()`
 returns longitude
-### `float getAltitude()`
+#### `float getAltitude()`
 returns altitude in meters
-### `bool getFix()`
+#### `bool getFix()`
 returns true if GPS fix; false otherwise
 
-## **Roll Control Library**
+### **Roll Control Library**
 
-### `rollControl()`
+#### `rollControl()`
 constructor
-### `void setup()`
+#### `void setup()`
 starts the servo drive signal to the zero (+offset) point
-### `void updateRollControl(ServoState state, float angle, float velo)`
+#### `void updateRollControl(ServoState state, float angle, float velo)`
 updates the servo control mode, rocket velocity for scaling, and angle (if in SERVO_ANGLE mode).
 
 `SERVO_STATE` is either `SERVO_ZERO`, `SERVO_ANGLE`, or `SERVO_PD`
-### `uint16_t getServo6Us()`
+#### `uint16_t getServo6Us()`
 returns time in us the servo 6 drive signal is a logic high
 
 conversion to degrees is `(us - 1500) / 500 * 60`
-### `uint16_t getServo7Us()`
+#### `uint16_t getServo7Us()`
 returns time in us the servo 7 drive signal is a logic high
 
 conversion to degrees is `(us - 1500) / 500 * 60`
