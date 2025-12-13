@@ -12,5 +12,5 @@ class DRV8452 {
         SPISettings _settings;
         int _cs;
         void _writeReg(byte reg, byte val);
-        void setCurrentLimit(float current);
+        void _setCurrentLimit(float current);
 };
