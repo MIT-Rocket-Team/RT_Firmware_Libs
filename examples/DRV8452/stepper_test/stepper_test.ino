@@ -1,4 +1,4 @@
-#include "Arduino.h"
+#include "SPI.h"
 #include "DRV8452.h"
 
 #define MOSI PA7
@@ -14,7 +14,6 @@ SPISettings settings(1000000, MSBFIRST, SPI_MODE0);
 DRV8452 drv(&SPI_3, settings, CS);
 
 void setup(){
-  pinMode(_cs, OUTPUT);
   digitalWrite(_cs, 1)
   delay(1000);
   Serial.begin(115200);
