@@ -2,12 +2,25 @@
 #include "GPS.h"
 
 GPS::GPS(HardwareSerial* gpsSer, float gpsAltOffset){
+  hwSerialUsed = true;
+  _hwGpsSer = gpsSer;
+  _gpsSer = gpsSer;
+  _gpsAltOffset = gpsAltOffset;
+}
+
+GPS::GPS(USBSerial* gpsSer, float gpsAltOffset){
+  hwSerialUsed = false;
+  _usbGpsSer = gpsSer;
   _gpsSer = gpsSer;
   _gpsAltOffset = gpsAltOffset;
 }
 
 void GPS::setup(){
-  _gpsSer -> begin(115200);
+  if (hwSerialUsed) {
+    _hwGpsSer -> begin(115200);
+  } else {
+    _usbGpsSer -> begin(115200);
+  }
 }
 
 void GPS::updateAndParse(){
@@ -104,8 +117,7 @@ Parse GPS data
 void GPS::_gpsParse(char *data, int length) {
     int start = 0;
     while (start < length) {
-        int newStart = start != 0 ? start + 10: start;
-        int end = _indexOf(data, '\n', newStart);
+        int end = _indexOf(data, '\n', start);
         if (end == -1) end = length;
         char *line = data + start;
         // ---------- FAST CHECKSUM ----------
@@ -144,8 +156,8 @@ void GPS::_gpsParse(char *data, int length) {
             char hemiLat = fields[4][0];
             char hemiLon = fields[6][0];
 
-            _latitude = convertToDecimalFast(rawLat, hemiLat);
-            _longitude = convertToDecimalFast(rawLon, hemiLon);
+            _latitude = _convertToDecimalFast(rawLat, hemiLat);
+            _longitude = _convertToDecimalFast(rawLon, hemiLon);
         }
 
         else if (memcmp(line, "$GNGGA", 6) == 0) {

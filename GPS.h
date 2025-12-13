@@ -1,14 +1,12 @@
 /*
 GPS: GPS setup and parsing
 */
-#ifndef GPS_h
-#define GPS_h
-
 #include "Arduino.h"
 
 class GPS {
   public:
     GPS(HardwareSerial* gpsSer, float gpsAltOffset);
+    GPS(USBSerial* gpsSer, float gpsAltOffset);
     void setup();
     void updateAndParse();
     float getPDOP();
@@ -19,7 +17,10 @@ class GPS {
     float getAltitude();
     bool getFix();
   private:
-    HardwareSerial* _gpsSer;
+    Stream* _gpsSer;
+    HardwareSerial* _hwGpsSer;
+    USBSerial* _usbGpsSer;
+    bool hwSerialUsed;
     float _pdop;
     float _vdop;
     float _hdop;
@@ -34,6 +35,6 @@ class GPS {
 
     bool _gpsUpdateData(int length);
     void _gpsParse(char *data, int length);
-    float _convertToDecimalFast();
+    float _convertToDecimalFast(float raw, char hemi);
     int _indexOf(const char* arr, char target, int start);
-}
+};
