@@ -40,7 +40,7 @@ returns true if GPS fix; false otherwise
 constructor
 #### `void setup()`
 starts the servo drive signal to the zero (+offset) point
-#### `void updateRollControl(ServoState state, float angle, float velo)`
+#### `void updateRollControl(ServoState state, float angle, float velo, float roll, float rollRate)`
 updates the servo control mode, rocket velocity for scaling, and angle (if in SERVO_ANGLE mode).
 
 `SERVO_STATE` is either `SERVO_ZERO`, `SERVO_ANGLE`, or `SERVO_PD`
