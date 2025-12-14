@@ -1,6 +1,7 @@
 package info.openrocket.core.simulation.listeners;
 
 import edu.mit.rocket_team.zephyrus.FC.RTFC;
+import info.openrocket.core.models.atmosphere.AtmosphericConditions;
 import info.openrocket.core.rocketcomponent.Rocket;
 import info.openrocket.core.rocketcomponent.RocketComponent;
 import info.openrocket.core.rocketcomponent.TabControlledTrapezoidFinSet;
@@ -13,6 +14,7 @@ import info.openrocket.core.util.*;
 import java.util.Iterator;
 import java.util.List;
 
+import static edu.mit.rocket_team.zephyrus.util.RTUtilLibrary.convertToImuAngles;
 import static java.lang.Math.*;
 
 /**
@@ -111,17 +113,12 @@ public class FlightControllerSimulatorListener extends AbstractSimulationListene
         double finTimeStep = status.getSimulationTime();
         latestTimeStep = finTimeStep - loopStart;
 
-        double current_fudged_altitude = status.getRocketWorldPosition().getAltitude() + (0.5-random())*2*amplitude_randomness_size;
-        altitudeMeasuredList.add(current_fudged_altitude);
         double realVelocity = status.getRocketVelocity().length();
-        double gps_fudged_altitude = Math.round(current_fudged_altitude*100.0)/100.0;
-        boolean gps_has_fix = true;
 
         pastOmegaZ.add(status.getRocketRotationVelocity().z);
-        pastThetaZ.add(toDegrees(toEulerAngles(status.getRocketOrientationQuaternion()).z));
+        pastThetaZ.add(toDegrees(toEulerAngles_rocketCoord(status.getRocketOrientationQuaternion()).z));
         finTabAngleLog.add(getFinTabAngleDeg());
         rktVelMagLog.add(realVelocity);
-        rktAltLog.add(current_fudged_altitude);
 
         List<Double> CldFlightBranch = status.getFlightDataBranch().get(FlightDataType.TYPE_ROLL_DAMPING_COEFF);
         CldLog.add(CldFlightBranch.get(CldFlightBranch.toArray().length-1));
@@ -132,16 +129,10 @@ public class FlightControllerSimulatorListener extends AbstractSimulationListene
         double currentTime = status.getSimulationTime();
         System.out.println("[JAVA] current time " + currentTime + "                     \r");
 
+
+        // fudging
         SimulationStatus fudgedStatus = status.clone();
-
-        WorldCoordinate realLocation = status.getRocketWorldPosition();
-        fudgedStatus.setRocketWorldPosition(new WorldCoordinate(
-                realLocation.getLatitudeRad(),
-                realLocation.getLongitudeRad(),
-                current_fudged_altitude));
-        fudgedStatus.putExtraData("fudged_gps_altitude", gps_fudged_altitude);
-        fudgedStatus.putExtraData("fudged_gps_has_fix", gps_has_fix);
-
+        fudgeSimulationStatus(fudgedStatus);
 
         RTFC.pre_loop(fudgedStatus.clone());
         RTFC.loop();
@@ -198,11 +189,136 @@ public class FlightControllerSimulatorListener extends AbstractSimulationListene
     }
 
 
+    // Master Fudger
+
+    public static void fudgeSimulationStatus(SimulationStatus fudgedStatus) {
+        // accel
+        List<Double> accelZ = fudgedStatus.getFlightDataBranch().get(FlightDataType.TYPE_ACCELERATION_Z);
+        List<Double> accelXY = fudgedStatus.getFlightDataBranch().get(FlightDataType.TYPE_ACCELERATION_XY);
+
+        Coordinate realAccel = new Coordinate(
+                accelXY.get(accelXY.size() - 1),
+                accelXY.get(accelXY.size() - 1),
+                accelZ.get(accelZ.size() - 1));
+        Coordinate fudgedAccel = fudgeAccel(realAccel);
+        fudgedStatus.putExtraData("fudged_accel", fudgedAccel);
+
+        // baro
+
+        double alt = fudgedStatus.getRocketWorldPosition().getAltitude();
+        AtmosphericConditions atmos = fudgedStatus.getSimulationConditions().
+                getAtmosphericModel().
+                getConditions(alt);
+
+        double rP0 = atmos.getPressure();
+        double rT0 = atmos.getTemperature();
+        double t0 = atmos.getTemperature();
+        double a0 = alt;
+        double p0 = atmos.getPressure();
+
+        double rP1 = fudgeRawPressure(rP0);
+        double rT1 = fudgeRawTemperature(rT0);
+        double t1 = fudgeTemperature(t0);
+        double a1 = fudgeAltitude(alt);
+        double p1 = fudgePressure(p0);
+
+        fudgedStatus.putExtraData("fudged_rawPressure", rP1);
+        fudgedStatus.putExtraData("fudged_rawTemperature", rT1);
+        fudgedStatus.putExtraData("fudged_temperature", t1);
+        fudgedStatus.putExtraData("fudged_altitude", a1);
+        fudgedStatus.putExtraData("fudged_pressure", p1);
+
+        // GPS
+        WorldCoordinate realLocation = fudgedStatus.getRocketWorldPosition();
+        WorldCoordinate fudgedLocation = fudgeGPS(realLocation);
+        boolean gps_has_fix = true; // possibly fudge this too.
+        fudgedStatus.putExtraData("fudged_gps_has_fix", gps_has_fix);
+        fudgedStatus.putExtraData("fudged_gps_position", fudgedLocation);
+
+        // Fudge the orientation
+
+        List<Double> rollAngles = fudgedStatus.getFlightDataBranch().get(FlightDataType.TYPE_ORIENTATION_PHI);
+        List<Double> pitchAngles = fudgedStatus.getFlightDataBranch().get(FlightDataType.TYPE_ORIENTATION_THETA);
+
+        double rollAngle = rollAngles.get(rollAngles.size() - 1);
+        double pitchAngle = pitchAngles.get(pitchAngles.size() - 1);
+        Coordinate worldAngle = convertToImuAngles(rollAngle, pitchAngle);
+        Coordinate fudgedWorldAngle = fudgeWorldAngle(worldAngle);
+        fudgedStatus.putExtraData("fudged_world_angle", fudgedWorldAngle);
+
+        List<Double> rollRates = fudgedStatus.getFlightDataBranch().get(FlightDataType.TYPE_ROLL_RATE);
+        List<Double> pitchRates = fudgedStatus.getFlightDataBranch().get(FlightDataType.TYPE_PITCH_RATE);
+
+        double rollRate = rollRates.get(rollRates.size() - 1);
+        double pitchRate = pitchRates.get(pitchRates.size() - 1);
+        Coordinate worldAngRate = convertToImuAngles(rollRate, pitchRate);
+        Coordinate fudgedWorldAngleRate = fudgeWorldAngleRate(worldAngRate);
+        fudgedStatus.putExtraData("fudged_world_angle_rate", fudgedWorldAngleRate);
+
+        // no return, its a shared reference
+    }
 
 
 
 
-    public static Coordinate toEulerAngles(Quaternion q) {
+
+    // Fudgers per sensor
+    // Accel
+    public static Coordinate fudgeAccel(Coordinate accel) {
+        // for the moment no-op.
+        return accel;
+    }
+
+    // Baro
+    public static double fudgeAltitude(double altitude) {
+        // fudge with ± amplitude_randomness_size meters
+        return altitude + (0.5-random())*2*amplitude_randomness_size;
+    }
+    public static double fudgeRawPressure(double rP0) {
+        // for the moment no-op.
+        return rP0;
+    }
+    public static double fudgeRawTemperature(double rT0) {
+        // for the moment no-op.
+        return rT0;
+    }
+    public static double fudgeTemperature(double t0) {
+        // for the moment no-op.
+        return t0;
+    }
+    public static double fudgePressure(double p0) {
+        // for the moment no-op.
+        return p0;
+    }
+
+    // GPS
+    public static WorldCoordinate fudgeGPS(WorldCoordinate location) {
+        // for the moment no-op.
+        return new WorldCoordinate(
+                location.getLatitudeRad(),
+                location.getLongitudeRad(),
+                location.getAltitude() // GPS-specific altitude fudging, not shared with baro.
+        );
+    }
+
+    // Mag / IMU
+    public static Coordinate fudgeWorldAngle(Coordinate worldAngle) {
+        // for the moment no-op.
+        return worldAngle;
+    }
+
+    // Gyro
+    public static Coordinate fudgeWorldAngleRate(Coordinate worldAngleRate) {
+        // for the moment no-op.
+        return worldAngleRate;
+    }
+
+
+
+
+
+
+    public static Coordinate toEulerAngles_rocketCoord(Quaternion q) {
 
         // roll (x-axis rotation)
         double sinr_cosp = 2 * (q.getW() * q.getX() + q.getY() * q.getZ());

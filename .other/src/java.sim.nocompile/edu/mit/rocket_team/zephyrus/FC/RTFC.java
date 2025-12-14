@@ -6,8 +6,12 @@ import edu.mit.rocket_team.zephyrus.util.data.*;
 import info.openrocket.core.models.atmosphere.AtmosphericConditions;
 import info.openrocket.core.simulation.FlightDataType;
 import info.openrocket.core.simulation.SimulationStatus;
+import info.openrocket.core.util.Coordinate;
+import info.openrocket.core.util.WorldCoordinate;
 
 import java.util.List;
+
+import static edu.mit.rocket_team.zephyrus.util.RTUtilLibrary.convertToImuAngles;
 
 // Flight computer code goes here.
 public class RTFC {
@@ -38,41 +42,51 @@ public class RTFC {
     public static void pre_loop(SimulationStatus fudgedStat) {
         currentFCsimStat = fudgedStat.clone();
 
-        List<Double> accelZ = currentFCsimStat.getFlightDataBranch().get(FlightDataType.TYPE_ACCELERATION_Z);
-        List<Double> accelXY = currentFCsimStat.getFlightDataBranch().get(FlightDataType.TYPE_ACCELERATION_XY);
+        // accel
+        Coordinate measuredAccel = (Coordinate) currentFCsimStat.getExtraData("fudged_accel");
+        // mag
+        Coordinate worldAngle = (Coordinate) currentFCsimStat.getExtraData("fudged_world_angle");
+        // gyro
+        Coordinate worldAngleRate = (Coordinate) currentFCsimStat.getExtraData("fudged_world_angle_rate");
 
-        // pressure
+        // baro
         double alt = currentFCsimStat.getRocketWorldPosition().getAltitude();
         AtmosphericConditions atmos = currentFCsimStat.getSimulationConditions().
                 getAtmosphericModel().
                 getConditions(alt);
 
-
+        // GPS
+        WorldCoordinate pos = (WorldCoordinate) currentFCsimStat.getExtraData("fudged_gps_position");
+        boolean hasFix = (Boolean) currentFCsimStat.getExtraData("fudged_gps_has_fix");
 
         RTAccelData accelDat = new RTAccelData(
-                accelXY.get(accelXY.size() - 1),
-                accelXY.get(accelXY.size() - 1),
-                accelZ.get(accelZ.size() - 1));
+                measuredAccel.x,
+                measuredAccel.y,
+                measuredAccel.z
+        );
         RTBaroData baroDat = new RTBaroData(
-                atmos.getPressure(),
-                atmos.getTemperature(),
-                atmos.getTemperature(),
-                alt, // fudged already, intended for barometer
-                atmos.getPressure());
+                (Double) currentFCsimStat.getExtraData("fudged_rawPressure"),
+                (Double) currentFCsimStat.getExtraData("fudged_rawTemperature"),
+                (Double) currentFCsimStat.getExtraData("fudged_temperature"),
+                (Double) currentFCsimStat.getExtraData("fudged_altitude"),
+                (Double) currentFCsimStat.getExtraData("fudged_pressure")
+        );
         RTGPSData gpsDat = new RTGPSData(
-                currentFCsimStat.getRocketWorldPosition().getLatitudeDeg(),
-                currentFCsimStat.getRocketWorldPosition().getLongitudeDeg(),
-                (Double) currentFCsimStat.getExtraData("fudged_gps_altitude"),
-                1.0,1.0,1.0,(Boolean) currentFCsimStat.getExtraData("fudged_gps_has_fix"));
+                pos.getLatitudeDeg(),
+                pos.getLongitudeDeg(),
+                pos.getAltitude(),
+                1.0,1.0,1.0,
+                hasFix
+        );
         RTGyroData gyroDat = new RTGyroData(
-                currentFCsimStat.getRocketRotationVelocity().x,
-                currentFCsimStat.getRocketRotationVelocity().y,
-                currentFCsimStat.getRocketRotationVelocity().z
+                worldAngleRate.x,
+                worldAngleRate.y,
+                worldAngleRate.z
         );
         RTMagData magDat = new RTMagData(
-                currentFCsimStat.getRocketPosition().x,
-                currentFCsimStat.getRocketPosition().y,
-                currentFCsimStat.getRocketPosition().z
+                worldAngle.x,
+                worldAngle.y,
+                worldAngle.z
         );
 
         RTInstrument[] sensors = {accel, baro, gps, gyro, mag};
