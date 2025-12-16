@@ -2,7 +2,7 @@ package edu.mit.rocket_team.zephyrus.control;
 
 import edu.mit.rocket_team.zephyrus.util.RTController;
 import edu.mit.rocket_team.zephyrus.util.data.RTPyroStatus;
-import edu.mit.rocket_team.zephyrus.util.data.RTState;
+import edu.mit.rocket_team.zephyrus.util.RTRocketState;
 import info.openrocket.core.simulation.SimulationStatus;
 
 public class RTPyroController extends RTController {
@@ -43,9 +43,9 @@ public class RTPyroController extends RTController {
         armed[pyro] = false;
     }
 
-    public void pyroMonitor(RTState currentState) {
+    public void pyroMonitor(RTRocketState currentState) {
         for (int i = 0; i < NUM_PYROS; i++) {
-            if (currentState == RTState.GROUND_TESTING) {
+            if (currentState == RTRocketState.GROUND_TESTING) {
                 //In ground testing, we only care if pyro is connected or disconnected
                 if (isPyroConnected(i)) {
                     setPyroStatus(i, RTPyroStatus.PYRO_CONNECTED);
@@ -71,7 +71,7 @@ public class RTPyroController extends RTController {
         }
     }
 
-    public boolean firePyro(int pyro) {
+    public void firePyro(int pyro) {
         if (armed[pyro]) {
             //digitalWrite(firePins[pyro], 1);
             fired[pyro] = true;
@@ -96,7 +96,7 @@ public class RTPyroController extends RTController {
         pyroStatuses |= (status.ID & 0b11) << (pyro * 2);
     }
 
-    //For sim use only
+    // For sim use only
     private int millis() {
         if (SIMULATION_STATUS != null) {
             return (int)(SIMULATION_STATUS.getSimulationTime()*1e3); // seconds to miliseconds
@@ -104,4 +104,8 @@ public class RTPyroController extends RTController {
             return (int)System.currentTimeMillis();
         }
     }
+
+    // TODO : write Pyro Controller Fudging Procedure
+    // TODO : include misfire fudging
+    // TODO : make sure to provide SIMULATION_STATUS in order to have millis() work properly
 }

@@ -1,6 +1,6 @@
-package edu.mit.rocket_team.zephyrus.util.data;
+package edu.mit.rocket_team.zephyrus.util;
 
-public enum RTState {
+public enum RTRocketState {
     GROUND_TESTING(0),
     PRE_FLIGHT(1),
     FLIGHT(2),
@@ -10,7 +10,7 @@ public enum RTState {
 
     public int ID = 0;
 
-    RTState(int ID) {
+    RTRocketState(int ID) {
         this.ID = ID;
     }
 }
