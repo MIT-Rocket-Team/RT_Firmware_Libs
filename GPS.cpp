@@ -7,19 +7,22 @@ GPS::GPS(HardwareSerial* gpsSer, float gpsAltOffset){
   _gpsSer = gpsSer;
   _gpsAltOffset = gpsAltOffset;
 }
-
+#ifdef HAVE_SERIALUSB
 GPS::GPS(USBSerial* gpsSer, float gpsAltOffset){
   hwSerialUsed = false;
   _usbGpsSer = gpsSer;
   _gpsSer = gpsSer;
   _gpsAltOffset = gpsAltOffset;
 }
+#endif
 
 void GPS::setup(){
   if (hwSerialUsed) {
     _hwGpsSer -> begin(115200);
   } else {
+    #ifdef HAVE_SERIALUSB
     _usbGpsSer -> begin(115200);
+    #endif
   }
 }
 

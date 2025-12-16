@@ -6,7 +6,9 @@ GPS: GPS setup and parsing
 class GPS {
   public:
     GPS(HardwareSerial* gpsSer, float gpsAltOffset);
+    #ifdef HAVE_SERIALUSB
     GPS(USBSerial* gpsSer, float gpsAltOffset);
+    #endif
     void setup();
     void updateAndParse();
     float getPDOP();
@@ -19,7 +21,9 @@ class GPS {
   private:
     Stream* _gpsSer;
     HardwareSerial* _hwGpsSer;
+    #ifdef HAVE_SERIALUSB
     USBSerial* _usbGpsSer;
+    #endif
     bool hwSerialUsed;
     float _pdop;
     float _vdop;
