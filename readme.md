@@ -11,10 +11,27 @@ See [this diagram](https://github.com/MIT-Rocket-Team/RT_Firmware_Libs/blob/mast
 
 ## Arduino Libraries
 
+### Accelerometer Library
+
+#### `ADXL357(SPIClass* SPI, SPISettings settings, int cs)`
+constructor
+#### `void setup()`
+Set range to +/- 40G, Set LPF to 125Hz and ODR to 500HZ, begin measurements
+#### `void update()`
+updates accelerometer values if available
+#### `float getAccelX()`
+returns x axis acceleration in m/s^2
+#### `float getAccelY()`
+returns y axis acceleration in m/s^2
+#### `float getAccelZ()`
+returns z axis acceleration in m/s^2
+
 ### GPS library
 
 #### `GPS(HardwareSerial* gpsSer)`
-constructor
+hardware serial constructor
+#### `GPS(USBSerial* gpsSer)`
+USB serial constructor
 #### `void setup()`
 begins serial port
 #### `void updateAndParse()`
