@@ -9,7 +9,10 @@ Arduino code is at the top level. For other files, see the directory `.other`, i
 
 See [this diagram](https://github.com/MIT-Rocket-Team/RT_Firmware_Libs/blob/master/.other/docs/system_architecture/UML_FC_sim.pdf) for an overview of the simulation clases (updated continually).
 
+
 ## Arduino Libraries
+
+---
 
 ### Accelerometer Library
 
@@ -25,6 +28,8 @@ returns x axis acceleration in m/s^2
 returns y axis acceleration in m/s^2
 #### `float getAccelZ()`
 returns z axis acceleration in m/s^2
+
+---
 
 ### GPS library
 
@@ -50,6 +55,8 @@ returns longitude
 returns altitude in meters
 #### `bool getFix()`
 returns true if GPS fix; false otherwise
+
+---
 
 ### **Roll Control Library**
 
