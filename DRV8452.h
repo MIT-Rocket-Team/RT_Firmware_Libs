@@ -3,14 +3,19 @@
 
 class DRV8452 {
     public:
-        DRV8452(SPIClass* SPI, SPISettings settings, int cs);
-        void fullStep(bool foward);
+        DRV8452(SPIClass* SPI, SPISettings settings, int cs, int slp, int en);
+        void fullStep(bool forward);
         void setup();
+        void setCurrentLimit(float current);
+        float getStepCurrentLimit();
+        float getHoldCurrentLimit();
         
     private:
         SPIClass* _SPI;
         SPISettings _settings;
         int _cs;
+        int _slp;
+        int _en;
         void _writeReg(byte reg, byte val);
-        void _setCurrentLimit(float current);
+        uint8_t _readReg(byte reg);
 };
