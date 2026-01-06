@@ -9,6 +9,7 @@ class DRV8452 {
         void setCurrentLimit(float current);
         float getStepCurrentLimit();
         float getHoldCurrentLimit();
+        uint8_t status();
         
     private:
         SPIClass* _SPI;

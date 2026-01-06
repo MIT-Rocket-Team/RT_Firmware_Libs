@@ -38,8 +38,11 @@ void DRV8452::setup(){
   digitalWrite(_cs, 1);
   digitalWrite(_slp, 1);
   digitalWrite(_en, 1);
+  delay(100);
   setCurrentLimit(3.5);
-  _writeReg(0x05, 0b00110000);
+  _writeReg(0x05, 0b00110000); //SPI step/dir
+  _writeReg(0x0C, 0b11010000); //Enable OL detection
+  _writeReg(0x04, 0b10001111); //Enable Outputs
 }
 
 void DRV8452::_writeReg(byte reg, byte val) {
@@ -61,4 +64,8 @@ uint8_t DRV8452::_readReg(byte reg) {
   _SPI->endTransaction();
   delayMicroseconds(1);
   return val;
+}
+
+uint8_t DRV8452::status() {
+  return _readReg(0x00);
 }
