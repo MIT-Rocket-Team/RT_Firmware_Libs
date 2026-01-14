@@ -6,7 +6,8 @@ class DRV8452 {
         DRV8452(SPIClass* SPI, SPISettings settings, int cs, int slp, int en);
         void fullStep(bool forward);
         void setup();
-        void setCurrentLimit(float current);
+        void setStepCurrentLimit(float current);
+        void setHoldCurrentLimit(float current);
         float getStepCurrentLimit();
         float getHoldCurrentLimit();
         uint8_t status();

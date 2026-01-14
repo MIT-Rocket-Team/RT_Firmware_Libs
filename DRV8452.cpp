@@ -10,9 +10,14 @@ DRV8452::DRV8452(SPIClass* SPI, SPISettings settings, int cs, int slp, int en) {
     _en = en;
 }
 
-void DRV8452::setCurrentLimit(float current){
+void DRV8452::setStepCurrentLimit(float current){
   uint8_t value = (current * 0.66 / 3.3) * 256 - 1;
   _writeReg(0x0E, value);
+  _writeReg(0x10, 0x12);
+}
+
+void DRV8452::setHoldCurrentLimit(float current){
+  uint8_t value = (current * 0.66 / 3.3) * 256 - 1;
   _writeReg(0x0D, value);
   _writeReg(0x10, 0x12);
 }
@@ -38,8 +43,9 @@ void DRV8452::setup(){
   digitalWrite(_cs, 1);
   digitalWrite(_slp, 1);
   digitalWrite(_en, 1);
-  delay(100);
-  setCurrentLimit(3.5);
+  delay(100); //wait for SPI interface to be ready after _slp goes high
+  setStepCurrentLimit(1); //conservative value, to prevent overheating if current limit not explicitly set
+  setHoldCurrentLimit(1);
   _writeReg(0x05, 0b00110000); //SPI step/dir
   _writeReg(0x0C, 0b11010000); //Enable OL detection
   _writeReg(0x04, 0b10001111); //Enable Outputs
