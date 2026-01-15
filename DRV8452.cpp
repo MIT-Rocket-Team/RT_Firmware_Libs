@@ -33,7 +33,7 @@ float DRV8452::getHoldCurrentLimit() {
 }
 
 void DRV8452::fullStep(bool forward){
-  _writeReg(0x05, (forward << 7) | 0b01110000);
+  _writeReg(0x05, (forward << 7) | 0b01110100);
 }
 
 void DRV8452::setup(){
