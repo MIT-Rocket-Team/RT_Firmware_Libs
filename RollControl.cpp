@@ -1,13 +1,12 @@
 #include "Arduino.h"
 #include "RollControl.h"
-// #include "MyTimer.h"
 
 #define kP 0.1887
 #define kD 0.03774
 #define setpoint 0.0
 #define OFFSET1 7 //CHANNEL 1 (PA8, HEADER 7, RED WIRE)
 #define OFFSET2 -2 //CHANNEL 2 (PA9, HEADER 6, ALL BLACK WIRES)
-// #define HAL_TIM_MODULE_ENABLED
+RollControl* RollControl::instance = nullptr;
 
 struct downlink {
   //MAG
@@ -31,7 +30,6 @@ struct downlink {
 };
 
 downlink pkt;
-
 HardwareTimer *myTim = new HardwareTimer(TIM1);
 
 /**
@@ -54,12 +52,6 @@ void RollControl::setup(){
     myTim->resume();
 }
 
-// extern "C" void HAL_TIM_PeriodElapsedCallback(TIM_HahndleTypeDef* htim)
-// {
-//     MyTimer::dispatch(htim);
-// }
-
-
 /**
  * Run pidUpdate() if state is at `SERVO_PD`
  */
@@ -69,21 +61,12 @@ void RollControl::updateITCallback() {
   }
 }
 
-// static void RollControl::staticUpdateITCallback() {
-//   updateITCallback();
-// }
-
-// void RollControl::isrThunk(){
-//   TIM_TypeDef* tim = get_timer
-// }
-
 /**
  * Converts degrees to pulse width
  */
 uint16_t RollControl::degToUs(float degrees) {
   return 1500.0 + (degrees / 60.0) * 500.0; 
 }
-
 
 /**
  * Update fin states and measurements
