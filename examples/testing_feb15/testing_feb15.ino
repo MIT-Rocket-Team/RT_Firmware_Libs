@@ -9,6 +9,7 @@
 
 int16_t enables[] = {EN0, EN1, EN2, EN3, EN4};
 
+
 TwoWire Wire1(PA6,PA7);
 TwoWire Wire2(PC14,PB6);
 
@@ -19,6 +20,17 @@ INA232 monitor3(&Wire2, 0b1000010);
 INA232 monitor4(&Wire1, 0b1000001);
 INA232 monitor5(&Wire1, 0b1000000);
 INA232 monitor6(&Wire1, 0b1000010);
+
+/*
+Monitor Key:
+1: 3.3V
+2: 3V
+3: 5V
+4: 7.4V
+5: 28V
+6: 8.4V 
+*/
+
 
 void setup() {
   // put your setup code here, to run once:
