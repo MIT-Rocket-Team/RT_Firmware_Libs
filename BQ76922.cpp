@@ -148,6 +148,12 @@ bool BQ76922::_writeMemBytes(uint16_t adr, uint16_t data) {
     return true;
 }
 
+bool BQ76922::chargePumpEnable() {
+    _writeMemByte(0x9309, 0x01);
+    //to-do: verify write
+    return true;
+}
+
 void BQ76922::enterConfigMode() {
     _writeSubCmdAdr(0x0090, true);
     while (1) {

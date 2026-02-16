@@ -29,6 +29,7 @@ class BQ76922 {
         bool writeOTP();
         void statusReadout();
         uint16_t statusHex();
+        bool chargePumpEnable();
 
     private:
         TwoWire* _Wire;
