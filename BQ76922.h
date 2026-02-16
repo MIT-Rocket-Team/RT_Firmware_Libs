@@ -30,6 +30,8 @@ class BQ76922 {
         void statusReadout();
         uint16_t statusHex();
         bool chargePumpEnable();
+        bool cellUVandSC();
+        bool cellSC20mV();
 
     private:
         TwoWire* _Wire;

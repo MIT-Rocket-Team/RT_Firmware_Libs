@@ -443,6 +443,21 @@ bool BQ76922::cellUVOnly() {
     return true;
 }
 
+bool BQ76922::cellUVandSC() {
+    _writeMemByte(0x9261, 0x84);
+
+    //to-do: verify write
+    return true;
+}
+
+bool BQ76922::cellSC20mV() {
+    _writeMemByte(0x9286, 0x01);
+    _writeMemByte(0x9287, 31);
+
+    //to-do: verify write
+    return true;
+}
+
 bool BQ76922::minCellVoltage(float voltage) {
     byte setting = (voltage / .0506) + 1; //round up for safety
     _writeMemByte(0x9275, setting);
