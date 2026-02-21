@@ -41,8 +41,8 @@ void vtx::_sendFrame(uint8_t cmd, uint8_t *data, uint8_t len) {
     frame[1] = 0x55;
     frame[2] = cmd;
     frame[3] = len;
-    memcpy(frame + 3, data, len);
-    frame[len + 4] = _crc(frame + 2, len + 2);
+    memcpy(frame + 4, data, len);
+    frame[len + 4] = _crc(frame, len + 4);
 
     _ser->write(0x00);
     _ser->write(frame, len + 5);
@@ -50,4 +50,8 @@ void vtx::_sendFrame(uint8_t cmd, uint8_t *data, uint8_t len) {
 
 void vtx::getSettings() {
     _sendFrame(0x03, nullptr, 0);
+}
+
+void vtx::setPower(uint8_t power) {
+    _sendFrame(0x05, &power, 1);
 }
