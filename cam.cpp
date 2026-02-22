@@ -46,3 +46,16 @@ void cam::_sendFrame(uint8_t cmd, uint8_t *data, uint8_t len) {
 void cam::getInfo() {
     _sendFrame(COMMAND_GET_DEVICE_INFO, nullptr, 0);
 }
+
+void cam::writeString(char* data, uint8_t len, uint8_t x, uint8_t y) {
+    uint8_t buf[63];
+
+    buf[0] = len;
+    buf[1] = x;
+    buf[2] = y;
+    memcpy(buf+3, data,len);
+
+    _sendFrame(COMMAND_DISP_WRITE_HORT_STRING, buf, len+3);
+}
+
+

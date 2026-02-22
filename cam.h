@@ -2,12 +2,14 @@
 #include "Arduino.h"
 
 #define COMMAND_GET_DEVICE_INFO 0x00
+#define COMMAND_DISP_WRITE_HORT_STRING 0x22
 
 class cam {
     public:
         cam(HardwareSerial* ser);
         void begin();
         void getInfo();
+        void writeString(char* data, uint8_t len, uint8_t x, uint8_t y);
 
     private:
         HardwareSerial* _ser;
