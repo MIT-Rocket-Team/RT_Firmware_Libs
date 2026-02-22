@@ -55,3 +55,7 @@ void vtx::getSettings() {
 void vtx::setPower(uint8_t power) {
     _sendFrame(0x05, &power, 1);
 }
+
+void vtx::setFreq(uint16_t freq) {
+    _sendFrame(0x09, &freq, 2);
+}

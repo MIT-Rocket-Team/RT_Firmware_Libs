@@ -7,6 +7,7 @@ class vtx {
         void begin();
         void getSettings();
         void setPower(uint8_t power);
+        void setFreq(uint16_t freq);
 
     private:
         HardwareSerial* _ser;
