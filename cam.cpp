@@ -53,9 +53,20 @@ void cam::writeString(char* data, uint8_t len, uint8_t x, uint8_t y) {
     buf[0] = len;
     buf[1] = x;
     buf[2] = y;
-    memcpy(buf+3, data,len);
+    memcpy(buf + 3, data, len);
+    buf[len + 3] = 0;
 
-    _sendFrame(COMMAND_DISP_WRITE_HORT_STRING, buf, len+3);
+    _sendFrame(COMMAND_DISP_WRITE_HORT_STRING, buf, len + 4);
 }
 
 
+void cam::writeString(char data, uint8_t x, uint8_t y) {
+    uint8_t buf[63];
+
+    buf[0] = len;
+    buf[1] = x;
+    buf[2] = y;
+    memcpy(buf+3, data, 1);
+
+    _sendFrame(COMMAND_DISP_WRITE_CHAR, buf, len + 3);
+}
