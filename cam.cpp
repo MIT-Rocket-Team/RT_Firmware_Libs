@@ -60,13 +60,12 @@ void cam::writeString(char* data, uint8_t len, uint8_t x, uint8_t y) {
 }
 
 
-void cam::writeString(char data, uint8_t x, uint8_t y) {
+void cam::writeChar(char data, uint8_t x, uint8_t y) {
     uint8_t buf[63];
 
-    buf[0] = len;
-    buf[1] = x;
-    buf[2] = y;
-    memcpy(buf+3, data, 1);
+    buf[0] = x;
+    buf[1] = y;
+    buf[2] = data;
 
-    _sendFrame(COMMAND_DISP_WRITE_CHAR, buf, len + 3);
+    _sendFrame(COMMAND_DISP_WRITE_CHAR, buf, 3);
 }

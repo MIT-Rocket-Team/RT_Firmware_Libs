@@ -60,5 +60,5 @@ void vtx::setFreq(uint16_t freq) {
     uint8_t data[2];
     data[0] = freq >> 8;
     data[1] = freq & 0xFF;
-    _sendFrame(0x09, &data, 2);
+    _sendFrame(0x09, (uint8_t*) &data, 2);
 }
