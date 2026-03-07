@@ -12,6 +12,7 @@ pyro::pyro() {
 void pyro::begin() {    
     for (int i = 0; i < 6; i++) {
         pinMode(firePins[i], OUTPUT);
+        pinMode(sens[i], INPUT);
     }
 }
 
@@ -20,7 +21,7 @@ bool pyro::connected(uint8_t channel) {
 }
 
 float pyro::resistance(uint8_t channel) {
-    return 0.5 * (analogRead(adcb[channel]) / analogRead(adca[channel]));
+    return 0.5 * (((float) analogRead(adcb[channel])) / ((float)analogRead(adca[channel])));
 }
 
 void pyro::arm(uint8_t channel) {
