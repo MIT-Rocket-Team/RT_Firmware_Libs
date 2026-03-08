@@ -32,6 +32,7 @@ void flash::programPage(uint8_t* data, uint32_t adr) {
     _SPI->transfer(data, 512);
     _SPI->endTransaction();
     digitalWrite(_cs, 1);
+    writeEnable();
 }
 
 void flash::readPage(uint8_t* data, uint32_t adr) {
@@ -55,6 +56,7 @@ void flash::sectorErase(uint32_t adr) {
     _SPI->transfer(adr);
     _SPI->endTransaction();
     digitalWrite(_cs, 1);
+    writeEnable();
 }
 
 void flash::writeEnable() {
