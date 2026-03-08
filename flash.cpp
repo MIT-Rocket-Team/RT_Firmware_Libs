@@ -8,6 +8,15 @@ flash::flash(SPIClass* SPI, SPISettings settings, int cs) {
     _cs = cs;
 }
 
+uint8_t flash::readStatusRegister() {
+    digitalWrite(_cs, 0);
+    _SPI->beginTransaction(_settings);
+    _SPI->transfer(0x05);
+    uint8_t status = _SPI->transfer(0x00);
+    _SPI->endTransaction();
+    digitalWrite(_cs, 1);
+    return status;
+}
 void flash::begin() {
     pinMode(_cs, OUTPUT);
     digitalWrite(_cs, 1);

@@ -10,6 +10,7 @@ class flash {
         void sectorErase(uint32_t adr);
         bool isBusy();
         void eraseFlash();
+        uint8_t readStatusRegister();
         
     private:
         SPIClass* _SPI;
