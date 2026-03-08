@@ -11,10 +11,10 @@ class flash {
         bool isBusy();
         void eraseFlash();
         uint8_t readStatusRegister();
+        void writeEnable();
         
     private:
         SPIClass* _SPI;
         SPISettings _settings;
         int _cs;
-        void _writeEnable();
 };

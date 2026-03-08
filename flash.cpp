@@ -20,7 +20,7 @@ uint8_t flash::readStatusRegister() {
 void flash::begin() {
     pinMode(_cs, OUTPUT);
     digitalWrite(_cs, 1);
-    _writeEnable();
+    writeEnable();
 }
 
 void flash::programPage(uint8_t* data, uint32_t adr) {
@@ -57,7 +57,7 @@ void flash::sectorErase(uint32_t adr) {
     digitalWrite(_cs, 1);
 }
 
-void flash::_writeEnable() {
+void flash::writeEnable() {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
     _SPI->transfer(0x06);
