@@ -1,209 +1,55 @@
 #include "Arduino.h"
 #include "GPS.h"
 
-GPS::GPS(HardwareSerial* gpsSer, float gpsAltOffset){
-  hwSerialUsed = true;
-  _hwGpsSer = gpsSer;
+uint8_t GPS_10HZ[14] = {0xB5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7A,0x12};
+uint8_t GPS_UBX_ENABLE[16] = {0xB5,0x62,0x06,0x01,0x08,0x00,0x01,0x07,0x00,0x01,0x00,0x00,0x00,0x00,0x18,0xE1};
+uint8_t GPS_SERIAL_CONFIG[28] = {0xB5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xD0,0x08,0x00,0x00,0x00,0xC2,0x01,0x00,0x07,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0xBE,0x72};
+uint8_t GPS_CONFIG_UPDATE[9] = {0xB5,0x62,0x06,0x00,0x01,0x00,0x01,0x08,0x22};
+
+GPS::GPS(HardwareSerial* gpsSer){
   _gpsSer = gpsSer;
-  _gpsAltOffset = gpsAltOffset;
-}
-#ifdef HAVE_SERIALUSB
-GPS::GPS(USBSerial* gpsSer, float gpsAltOffset){
-  hwSerialUsed = false;
-  _usbGpsSer = gpsSer;
-  _gpsSer = gpsSer;
-  _gpsAltOffset = gpsAltOffset;
-}
-#endif
-
-void GPS::setup(){
-  if (hwSerialUsed) {
-    _hwGpsSer -> begin(115200);
-  } else {
-    #ifdef HAVE_SERIALUSB
-    _usbGpsSer -> begin(115200);
-    #endif
-  }
 }
 
-void GPS::updateAndParse(){
-  _gpsUpdateData(sizeof(_gpsData)); //sizeOf() if this doesn't work, replace with 100
-  _gpsParse(_gpsData, sizeof(_gpsData));
+void GPS::begin() {
+  _gpsSer.begin(9600);
+  _gpsSer.write(GPS_10HZ, 14);
+  _gpsSer.write(GPS_UBX_ENABLE, 16);
+  _gpsSer.write(GPS_SERIAL_CONFIG, 28);
+  _gpsSer.write(GPS_CONFIG_UPDATE, 9);
+  _gpsSer.flush();
+  _gpsSer.begin(115200);
 }
 
-float GPS::getPDOP(){
-  return _pdop;
-}
-
-float GPS::getVDOP(){
-  return _vdop;
-}
-
-float GPS::getHDOP(){
-  return _hdop;
-}
-
-float GPS::getLatitude(){
-  return _latitude;
-}
-
-float GPS::getLongitude(){
-  return _longitude;
-}
-
-float GPS::getAltitude(){
-  return _altitude;
-}
-
-bool GPS::getFix(){
-  return _fix;
-}
-
-///////// PRIVATE METHODS //////////
-
-/**
-Finds index of target in char array
-@param start starting index, inclusive
-@return int, -1 if not found
-*/
-int GPS::_indexOf(const char* arr, char target, int start) {
-  for (int i = start; arr[i] != '\0'; i++) {
-    if (arr[i] == target) {
-      return i;   // found
-    }
-  }
-  return -1;      // not found
-}
-
-/**
-Converts degrees to decimals
-*/
-float GPS::_convertToDecimalFast(float raw, char hemi) {
-    int deg = raw / 100;
-    float minutes = raw - deg * 100;
-    float decimal = deg + minutes / 60.0;
-
-    if (hemi == 'S' || hemi == 'W')
-        decimal = -decimal;
-
-    return decimal;
-}
-
-/**
-Updates GPS data buffer
-@param length length of buffer
-*/
-bool GPS::_gpsUpdateData(int length){
-  uint16_t avail = _gpsSer -> available();
-  while (avail > length) {
-    _gpsSer -> read();
-    avail--;
-  }
-  if (avail) {
-    //Shift existing data to the left
-    for(uint8_t i = avail; i < length; i++) {
-      _gpsData[i - avail] = _gpsData[i];
-    }
-    //Read new data into the end
-    for (uint8_t i = avail; i > 0; i--) {
-      _gpsData[length - i] = _gpsSer -> read();
-    }
-    return true;
-  }
-  return false;
-}
-
-/**
-Parse GPS data 
-@param length length of the buffer
-*/
-void GPS::_gpsParse(char *data, int length) {
-    int start = 0;
-    while (start < length) {
-        int end = _indexOf(data, '\n', start);
-        if (end == -1) end = length;
-        char *line = data + start;
-        // ---------- FAST CHECKSUM ----------
-        char *star = (char*)memchr(line, '*', end - start);
-        if (!star) { start = end + 1; continue; }
-
-        uint8_t sum = 0;
-        for (char *p = line + 1; p < star; p++) sum ^= *p;
-
-        uint8_t transmitted = strtol(star + 1, NULL, 16);
-        if (sum != transmitted) {
-            start = end + 1;
-            continue;
-        }
-
-        // ---------- PARSE SENTENCES ----------
-        if (memcmp(line, "$GNRMC", 6) == 0) {
-
-            // Fields by pointer
-            char *fields[12] = {0};
-            int fieldIndex = 0;
-            fields[0] = line;
-
-            for (char *p = line; p < line + (end - start); p++) {
-                if (*p == ',') {
-                    *p = '\0';
-                    fields[++fieldIndex] = p + 1;
-                }
+void GPS::update() {
+  while (_gpsSer.available()) {
+    if (_validateHeader()) {
+        if(_gpsSer.available() >= 98) {
+            _readPacket();
+            if (_validateChecksum()) {
+              memcpy(&_pkt, _buf + 4, 92);
             }
-
-            _fix = (fields[2][0] == 'A');
-
-            float rawLat = atof(fields[3]);
-            float rawLon = atof(fields[5]);
-
-            char hemiLat = fields[4][0];
-            char hemiLon = fields[6][0];
-
-            _latitude = _convertToDecimalFast(rawLat, hemiLat);
-            _longitude = _convertToDecimalFast(rawLon, hemiLon);
         }
-
-        else if (memcmp(line, "$GNGGA", 6) == 0) {
-
-            char *fields[15] = {0};
-            int idx = 0;
-            fields[0] = line;
-
-            for (char *p = line; p < line + (end - start); p++) {
-                if (*p == ',') {
-                    *p = '\0';
-                    fields[++idx] = p + 1;
-                }
-            }
-
-            float alt = atof(fields[9]);
-            float geoid = atof(fields[11]);
-
-            _rawGPS = alt + geoid;
-            _altitude = _rawGPS - _gpsAltOffset;
-
-            if (_fix && _altitude > _maxGpsAlt)
-                _maxGpsAlt = _altitude;
-        }
-
-        else if (memcmp(line, "$GNGSA", 6) == 0) {
-
-            char *fields[25] = {0};
-            int idx = 0;
-            fields[0] = line;
-
-            for (char *p = line; p < line + (end - start); p++) {
-                if (*p == ',') {
-                    *p = '\0';
-                    fields[++idx] = p + 1;
-                }
-            }
-
-            _pdop = atof(fields[15]);
-            _hdop = atof(fields[16]);
-            _vdop = atof(fields[17]);
-        }
-
-        start = end + 1;
     }
+  }
+}
+
+bool GPS::_validateHeader() {
+  return GPS.read() == 0xB5 && GPS.read() == 0x62 && GPS.read() == 0x01 && GPS.read() == 0x07 && GPS.read() == 0x5C && GPS.read() == 0x00;
+}
+
+void GPS::_readPacket() {
+  _gpsSer.readBytes(_buf + 4, 98);
+  _buf[0] = 0x01;
+  _buf[1] = 0x07;
+  _buf[2] = 0x5C;
+  _buf[3] = 0x00;
+}
+
+void GPS::_validateChecksum() {
+  uint8_t ck_a = 0, ck_b = 0;
+  for (int i = 0; i < 96; i++) {
+    ck_a += _buf[i];
+    ck_b += ck_a;
+  }
+  return ck_a == _buf[96] && ck_b == _buf[97];
 }
