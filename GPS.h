@@ -59,4 +59,5 @@ class GPS {
     HardwareSerial* _gpsSer;
     ubx_nav_pvt_t _pkt;
     uint8_t* _buf[98];
+    bool _headerValid;
 };

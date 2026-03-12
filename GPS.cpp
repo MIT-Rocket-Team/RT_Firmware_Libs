@@ -11,41 +11,57 @@ GPS::GPS(HardwareSerial* gpsSer){
 }
 
 void GPS::begin() {
-  _gpsSer.begin(9600);
-  _gpsSer.write(GPS_10HZ, 14);
-  _gpsSer.write(GPS_UBX_ENABLE, 16);
-  _gpsSer.write(GPS_SERIAL_CONFIG, 28);
-  _gpsSer.write(GPS_CONFIG_UPDATE, 9);
-  _gpsSer.flush();
-  _gpsSer.begin(115200);
+  _gpsSer->begin(9600);
+  _gpsSer->write(GPS_10HZ, 14);
+  _gpsSer->write(GPS_UBX_ENABLE, 16);
+  _gpsSer->write(GPS_SERIAL_CONFIG, 28);
+  _gpsSer->write(GPS_CONFIG_UPDATE, 9);
+  _gpsSer->flush();
+  _gpsSer->begin(115200);
 }
 
 void GPS::update() {
-  while (_gpsSer.available()) {
-    if (_validateHeader()) {
-        if(_gpsSer.available() >= 98) {
-            _readPacket();
-            if (_validateChecksum()) {
-              memcpy(&_pkt, _buf + 4, 92);
-            }
+  bool endLoop = false;
+  while (_gpsSer->available() >= 6 && !endLoop) {
+    if (!_headerValid) {
+      if (_gpsSer->peek() == 0xB5) {
+        _headerValid = _validateHeader();
+      } else {
+        _gpsSer->read();
+      }
+    } else {
+      if(_gpsSer->available() >= 94) {
+        _readPacket();
+        if (_validateChecksum()) {
+          memcpy(&_pkt, _buf + 4, 92);
         }
+      } else {
+        endLoop = true;
+      }
+      _headerValid = false;
     }
   }
 }
 
 bool GPS::_validateHeader() {
-  return GPS.read() == 0xB5 && GPS.read() == 0x62 && GPS.read() == 0x01 && GPS.read() == 0x07 && GPS.read() == 0x5C && GPS.read() == 0x00;
+  if (_gpsSer->read() != 0xB5) return false;
+  if (_gpsSer->read() != 0x62) return false;
+  if (_gpsSer->read() != 0x01) return false;
+  if (_gpsSer->read() != 0x07) return false;
+  if (_gpsSer->read() != 0x5C) return false;
+  if (_gpsSer->read() != 0x00) return false;
+  return true;
 }
 
 void GPS::_readPacket() {
-  _gpsSer.readBytes(_buf + 4, 98);
+  _gpsSer->readBytes(_buf + 4, 94);
   _buf[0] = 0x01;
   _buf[1] = 0x07;
   _buf[2] = 0x5C;
   _buf[3] = 0x00;
 }
 
-void GPS::_validateChecksum() {
+bool GPS::_validateChecksum() {
   uint8_t ck_a = 0, ck_b = 0;
   for (int i = 0; i < 96; i++) {
     ck_a += _buf[i];
