@@ -35,10 +35,11 @@ void GPS::update() {
         if (_validateChecksum()) {
           memcpy(&_pkt, _buf + 4, 92);
         }
+        _headerValid = false;
       } else {
         endLoop = true;
       }
-      _headerValid = false;
+      
     }
   }
 }
