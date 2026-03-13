@@ -15,13 +15,23 @@ class gyro {
         gyro(SPIClass* SPI, SPISettings settings, int cs);
         void begin();
         void config();
-        int16_t gyro_x();
-        int16_t gyro_y();
-        int16_t gyro_z();
+        void update();
+        int16_t getRawX();
+        int16_t getRawY();
+        int16_t getRawZ();
+        int16_t getDpsX();
+        int16_t getDpsY();
+        int16_t getDpsZ();
         
     private:
         SPIClass* _SPI;
         SPISettings _settings;
         int _cs;
+        int16_t _rawX;
+        int16_t _rawY;
+        int16_t _rawZ;
+        int16_t _dpsX;
+        int16_t _dpsY;
+        int16_t _dpsZ;
         void _writeReg(byte reg, byte val);
 };

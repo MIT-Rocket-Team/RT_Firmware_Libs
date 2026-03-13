@@ -29,26 +29,37 @@ void gyro::config() {
     _writeReg(0x1B, 0x10); //1000 dps
 }
 
-int16_t gyro::gyro_x() {
+void gyro::update() {
     digitalWrite(_cs, 0);
     _SPI->transfer(READ | GYRO_XOUT_H);
-    int16_t res = _SPI->transfer16(0x00);
+    _SPI->beginTransaction(_settings);
+    _rawX = _SPI->transfer16(0x00);
+    _rawY = _SPI->transfer16(0x00);
+    _rawZ = _SPI->transfer16(0x00);
+    _SPI->endTransaction();
     digitalWrite(_cs, 1);
-    return res;
 }
 
-int16_t gyro::gyro_y() {
-    digitalWrite(_cs, 0);
-    _SPI->transfer(READ | GYRO_YOUT_H);
-    int16_t res = _SPI->transfer16(0x00);
-    digitalWrite(_cs, 1);
-    return res;
+int16_t gyro::getRawX() {
+    return _rawX;
 }
 
-int16_t gyro::gyro_z() {
-    digitalWrite(_cs, 0);
-    _SPI->transfer(READ | GYRO_ZOUT_H);
-    int16_t res = _SPI->transfer16(0x00);
-    digitalWrite(_cs, 1);
-    return res;
+int16_t gyro::getRawY() {
+    return _rawY;
+}
+
+int16_t gyro::getRawZ() {
+    return _rawZ;
+}
+
+int16_t gyro::getDpsX() {
+    return _rawX * 0.03051757812;
+}
+
+int16_t gyro::getDpsY() {
+    return _rawY * 0.03051757812;
+}
+
+int16_t gyro::getDpsZ() {
+    return _rawZ * 0.03051757812;
 }
