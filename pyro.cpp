@@ -40,3 +40,11 @@ void pyro::off(uint8_t channel) {
     digitalWrite(firePins[channel], LOW);
     _fired[channel] = false;
 }
+
+bool pyro::isArmed(uint8_t channel) {
+    return _armed[channel];
+}
+
+bool pyro::isFired(uint8_t channel) {
+    return _fired[channel];
+}
