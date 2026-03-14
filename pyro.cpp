@@ -31,6 +31,7 @@ void pyro::arm(uint8_t channel) {
 void pyro::fire(uint8_t channel) {
     if (_armed[channel]) {
         digitalWrite(firePins[channel], HIGH);
+        _firedTimes[channel] = millis();
         _fired[channel] = true;
         _armed[channel] = false;
     }
@@ -47,4 +48,48 @@ bool pyro::isArmed(uint8_t channel) {
 
 bool pyro::isFired(uint8_t channel) {
     return _fired[channel];
+}
+
+uint16_t pyro::getPyrosStatus() {
+    return _pyroStatus;
+}
+
+PyroStatus pyro::getPyroStatus(uint8_t channel) {
+  return static_cast<PyroStatus> ((uint8_t) ((_pyroStatus >> (channel * 2)) & 0b11));
+}
+
+void pyro::update(State rocketState) {
+    for (uint8_t i = 0; i < 6; i++) {
+        //turn off pyros if they have been on for > PYRO_FIRE_DURATION
+        if (_fired[i] && millis() - _firedTimes[i] > PYRO_FIRE_DURATION) {
+            off(i);
+            //If pyro no longer connected and didn't come unconnected earlier, then it's a success
+            if (!connected(i) && getPyroStatus(i) != PYRO_FAILURE) {
+                _setPyroStatus(i, PYRO_SUCCESS);
+            } else {
+                _setPyroStatus(i, PYRO_FAILURE);
+            }
+        }
+        //Update pyro state
+        //in ground testing, we only care if pyro is connected or disconnected
+        if (rocketState == GROUND_TESTING) {
+            if (connected(i)) {
+                _setPyroStatus(i, PYRO_CONNECTED);
+            } else {
+                _setPyroStatus(i, PYRO_UNCONNECTED);
+            }
+        } else {
+            //Otherwise, an unconnected pyro is a failure unless it has been successfully fired
+            if (!connected(i) && getPyroStatus(i) != PYRO_SUCCESS && !_fired[i]) {
+                _setPyroStatus(i, PYRO_FAILURE);
+            }
+        }
+    }
+    
+}
+
+void pyro::_setPyroStatus(uint8_t channel, PyroStatus val) {
+  uint16_t mask = 0b11 << (channel * 2);
+  _pyroStatus &= ~mask;
+  _pyroStatus |= (val & 0b11) << (channel * 2);
 }
