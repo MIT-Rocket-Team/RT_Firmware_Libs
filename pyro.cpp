@@ -1,9 +1,19 @@
 #include "pyro.h"
 
+#ifdef PE10
+
 int adca[6] = {PB1, PB0, PC5, PC4, PA7, PA6};
 int adcb[6] = {PC0, PC1, PA0, PA1, PA2, PA3};
 int firePins[6] = {PB3, PB5, PB6, PB7, PB8, PB9};
 int sens[6] = {PE15, PE14, PE13, PE12, PE11, PE10};
+
+#else
+int adca[6];
+int adcb[6];
+int firePins[6];
+int sens[6];
+
+#endif
 
 
 pyro::pyro() {

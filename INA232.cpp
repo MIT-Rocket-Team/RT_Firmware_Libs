@@ -31,3 +31,11 @@ float INA232::voltage() {
 float INA232::current() {
     return _readReg(0x01) * 0.000625;
 }
+
+int16_t INA232::voltageRaw() {
+    return _readReg(0x02);
+}
+
+int16_t INA232::currentRaw() {
+    return _readReg(0x01);
+}
