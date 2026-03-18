@@ -7,6 +7,8 @@ class INA232 {
         void begin();
         float voltage();
         float current();
+        int16_t voltageRaw();
+        int16_t currentRaw();
 
     private:
         TwoWire* _Wire;
