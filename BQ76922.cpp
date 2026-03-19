@@ -465,3 +465,8 @@ bool BQ76922::minCellVoltage(float voltage) {
     //to-do: verify write
     return true;
 }
+
+uint8_t BQ76922::safetyStatusA() {
+    _dirCmdR(0x03, 1);
+    return _buf[0];
+}
