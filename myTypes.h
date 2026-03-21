@@ -10,6 +10,13 @@ enum State {
   END
 };
 
+enum PyroStatus {
+  PYRO_FAILURE,
+  PYRO_UNCONNECTED,
+  PYRO_CONNECTED,
+  PYRO_SUCCESS
+};
+
 typedef struct __attribute__((packed))
 {
   int16_t cell1;
@@ -19,6 +26,7 @@ typedef struct __attribute__((packed))
   int16_t current;
   float temp;
   uint8_t fetStatus;
+  uint8_t protectionStatus;
 } bmsData;
 
 typedef struct __attribute__((packed))
@@ -27,5 +35,13 @@ typedef struct __attribute__((packed))
   int16_t voltages[6];
   int16_t currents[6];
 } pwrBoardData;
+
+typedef struct __attribute__((packed))
+{
+  PyroStatus statuses[6];
+  uint8_t armed[6];
+  uint8_t fired[6];
+  float resistances[6];
+} pyroData;
 
 #endif
