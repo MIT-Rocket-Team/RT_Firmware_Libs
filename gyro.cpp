@@ -1,6 +1,7 @@
 #include "Arduino.h"
 #include "SPI.h"
 #include "gyro.h"
+#include "math.h"
 
 gyro::gyro(SPIClass* SPI, SPISettings settings, int cs) {
     _SPI = SPI;
@@ -31,13 +32,20 @@ void gyro::config() {
 
 void gyro::update() {
     digitalWrite(_cs, 0);
-    _SPI->transfer(READ | GYRO_XOUT_H);
     _SPI->beginTransaction(_settings);
+    _SPI->transfer(READ | GYRO_XOUT_H);
     _rawX = _SPI->transfer16(0x00);
     _rawY = _SPI->transfer16(0x00);
     _rawZ = _SPI->transfer16(0x00);
     _SPI->endTransaction();
     digitalWrite(_cs, 1);
+
+    uint32_t now = micros();
+    _roll += getDpsX() * -1.0 * (now - _lastUpdate) / 1000000.0; //Define roll as positive clockwise looking down at rocket
+    _pitch += getDpsY() * (now - _lastUpdate) / 1000000.0;
+    _yaw += getDpsZ() * (now - _lastUpdate) / 1000000.0;
+    _angleFromVertical = acos(cos(_pitch * PI / 180.0) * cos(_yaw * PI / 180)) * 180.0 / PI;
+    _lastUpdate = now;
 }
 
 int16_t gyro::getRawX() {
@@ -62,4 +70,26 @@ int16_t gyro::getDpsY() {
 
 int16_t gyro::getDpsZ() {
     return _rawZ * 0.03051757812;
+}
+
+float gyro::getRoll() {
+    return _roll;
+}
+
+float gyro::getPitch() {
+    return _pitch;
+}
+
+float gyro::getYaw() {
+    return _yaw;
+}
+
+float gyro::getAngleFromVertical() {
+    return _angleFromVertical;
+}
+
+void gyro::zeroRollPitchYaw() {
+    _roll = 0;
+    _pitch = 0;
+    _yaw = 0;
 }

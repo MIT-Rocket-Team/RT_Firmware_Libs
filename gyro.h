@@ -22,6 +22,11 @@ class gyro {
         int16_t getDpsX();
         int16_t getDpsY();
         int16_t getDpsZ();
+        float getRoll();
+        float getPitch();
+        float getYaw();
+        float getAngleFromVertical();
+        void zeroRollPitchYaw();
         
     private:
         SPIClass* _SPI;
@@ -34,4 +39,9 @@ class gyro {
         int16_t _dpsY;
         int16_t _dpsZ;
         void _writeReg(byte reg, byte val);
+        uint32_t _lastUpdate;
+        float _roll;
+        float _pitch;
+        float _yaw;
+        float _angleFromVertical;
 };
