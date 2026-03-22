@@ -55,7 +55,7 @@ bool ADXL357::_dataReady(){
     return data & 1;
 }
 
-void ADXL357::update() {
+void ADXL357::update(State rocketState) {
     if(_dataReady()){
         uint8_t data[10];
         data[0] = (0x08 << 1) | 1;
@@ -79,7 +79,7 @@ void ADXL357::update() {
 
         uint32_t now = micros();
         //Only integrate if above threshold in pre-flight
-        if (currentState == PRE_FLIGHT) {
+        if (rocketState == PRE_FLIGHT) {
             if (_verticalAccelMinusGravity > ACCEL_PREFLIGHT_INTEGRATION_THRESHOLD) {
                 _integratedVelo = _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
             }

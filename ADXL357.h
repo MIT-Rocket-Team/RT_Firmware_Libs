@@ -13,7 +13,7 @@ class ADXL357 {
         int32_t getRawX();
         int32_t getRawY();
         int32_t getRawZ();
-        void update();
+        void update(State rocketState);
         float getVerticalAccelMinusGravity();
         float getIntegratedVelo();
         void zeroIntegratedVelo();
