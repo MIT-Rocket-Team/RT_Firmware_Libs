@@ -74,6 +74,19 @@ void ADXL357::update() {
         _accelZraw = ((data[7] << 16) + (data[8] << 8)+(data[9])) >> 4;
         _accelZraw = ((int32_t) (_accelZraw << 12)) >> 12;
         _accelZ = _accelZraw / 12800.0 * 9.80665;
+
+        _verticalAccelMinusGravity = _accelX - 9.8065;
+
+        uint32_t now = micros();
+        //Only integrate if above threshold in pre-flight
+        if (currentState == PRE_FLIGHT) {
+            if (_verticalAccelMinusGravity > ACCEL_PREFLIGHT_INTEGRATION_THRESHOLD) {
+                _integratedVelo = _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
+            }
+        } else {
+            _integratedVelo = _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
+        }
+        _lastUpdate = now();
     }
 }
 
@@ -84,4 +97,16 @@ void ADXL357::_writeReg(byte reg, byte val) {
     _SPI->transfer(val);
     digitalWrite(_cs, 1);
     _SPI->endTransaction();
+}
+
+float ADXL357::getVerticalAccelMinusGravity() {
+    return _verticalAccelMinusGravity;
+}
+
+float ADXL357::getIntegratedVelo() {
+    return _integratedVelo;
+}
+
+void ADXL357::zeroIntegratedVelo() {
+    _integratedVelo = 0;
 }
