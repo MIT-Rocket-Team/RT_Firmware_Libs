@@ -3,13 +3,6 @@
 
 #define PYRO_FIRE_DURATION 250
 
-enum PyroStatus {
-  PYRO_FAILURE,
-  PYRO_UNCONNECTED,
-  PYRO_CONNECTED,
-  PYRO_SUCCESS
-};
-
 class pyro {
     public:
         pyro();

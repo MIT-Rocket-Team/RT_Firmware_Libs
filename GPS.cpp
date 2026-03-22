@@ -79,6 +79,6 @@ void GPS::zeroAlt() {
   _maxAlt = 0;
 }
 
-float GPS::maxAlt() {
+float GPS::getMaxAlt() {
   return _maxAlt;
 }

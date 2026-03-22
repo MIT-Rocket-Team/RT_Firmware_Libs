@@ -1,5 +1,6 @@
 #include "Arduino.h"
 #include "SPI.h"
+#include "myTypes.h"
 
 #define ACCEL_PREFLIGHT_INTEGRATION_THRESHOLD 10
 

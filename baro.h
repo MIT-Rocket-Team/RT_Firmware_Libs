@@ -34,6 +34,7 @@ class baro {
         float getFilteredAltitude();
         float getMaxAlt();
         void zeroAlt();
+        void updateAll();
         
     private:
         SPIClass* _SPI;

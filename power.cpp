@@ -10,10 +10,10 @@ void power::begin() {
 }
 
 void power::update() {
-    while (pwrSer->available() >= sizeof(_pkt) + 2) {
-        if (pwrSer->read() == 0xAA) {
-            pwrSer->readBytes(_tmp, sizeof(_pkt));
-            if (pwrSer->read() == _calcChecksumP(_tmp)) {
+    while (_pwrSer->available() >= sizeof(_pkt) + 2) {
+        if (_pwrSer->read() == 0xAA) {
+            _pwrSer->readBytes(_tmp, sizeof(_pkt));
+            if (_pwrSer->read() == _calcChecksum(_tmp)) {
                 memcpy(&_pkt, _tmp, sizeof(_pkt));    
             } 
         }
@@ -28,12 +28,12 @@ uint8_t power::_calcChecksum(uint8_t* p) {
   return ret;
 }
 
-uint16_t power::getConverterVoltage(uint8_t conveter) {
-    return _pkt.voltages[i];
+uint16_t power::getConverterVoltage(uint8_t converter) {
+    return _pkt.voltages[converter];
 }
 
-uint16_t power::getConverterCurrent(uint8_t conveter) {
-    return _pkt.currents[i];
+uint16_t power::getConverterCurrent(uint8_t converter) {
+    return _pkt.currents[converter];
 }
 
 uint16_t power::getCell1Voltage() {

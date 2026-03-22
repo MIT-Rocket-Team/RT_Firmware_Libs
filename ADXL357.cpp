@@ -86,7 +86,7 @@ void ADXL357::update(State rocketState) {
         } else {
             _integratedVelo = _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
         }
-        _lastUpdate = now();
+        _lastUpdate = now;
     }
 }
 
