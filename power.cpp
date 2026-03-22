@@ -56,6 +56,10 @@ uint8_t power::getProtectionStatus() {
     return _pkt.BMS.protectionStatus;
 }
 
+uint8_t power::getProtectionsEnabled() {
+    return _pkt.BMS.protectionEnabled;
+}
+
 float power::getTemp() {
     return _pkt.BMS.temp;
 }

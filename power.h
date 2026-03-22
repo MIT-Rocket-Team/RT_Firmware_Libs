@@ -14,6 +14,7 @@ class power {
     uint16_t getCell3Voltage();
     uint16_t getTotalCurrent();
     uint8_t getProtectionStatus();
+    uint8_t getProtectionsEnabled();
     float getTemp();
 
   private:

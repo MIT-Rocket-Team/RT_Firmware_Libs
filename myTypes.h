@@ -27,6 +27,7 @@ typedef struct __attribute__((packed))
   float temp;
   uint8_t fetStatus;
   uint8_t protectionStatus;
+  uint8_t protectionEnabled;
 } bmsData;
 
 typedef struct __attribute__((packed))
