@@ -17,6 +17,7 @@
 #define C5 0x91E3
 #define C6 0x6FEC
 
+#define MAVG_SAMPLES 20
 
 class baro {
     public:
@@ -30,10 +31,13 @@ class baro {
         float getTemperature();
         float getPressure();
         float getAltitude();
+        float getFilteredAltitude();
         
     private:
         SPIClass* _SPI;
         SPISettings _settings;
         int _cs;
         uint32_t _rawTemp, _rawPress;
+        float _filteredAlt;
+        float _filteredAltSamples[MAVG_SAMPLES];
 };

@@ -20,11 +20,11 @@ void baro::begin(){
 void baro::updateRawPress() {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
-    _SPI->transfer(0x44);
+    _SPI->transfer(0x42);
     _SPI->endTransaction();
     digitalWrite(_cs, 1);
 
-    delay(3);
+    delayMicroseconds(1500);
 
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
@@ -38,11 +38,11 @@ void baro::updateRawPress() {
 void baro::updateRawTemp() {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
-    _SPI->transfer(0x54);
+    _SPI->transfer(0x52);
     _SPI->endTransaction();
     digitalWrite(_cs, 1);
 
-    delay(3);
+    delayMicroseconds(1500);
 
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
@@ -97,4 +97,22 @@ uint16_t baro::getCalibrationConstant(uint8_t index) {
     _SPI->endTransaction();
     digitalWrite(_cs, 1);
     return res;
+}
+
+float baro::getFilteredAltitude() {
+    return _filteredAlt;
+}
+
+void baro::updateAll() {
+    updateRawTemp();
+    updateRawPress();
+    for(int8_t i = MAVG_SAMPLES - 2; i > - 1; i--) {
+        _filteredAltSamples[i+1] = _filteredAltSamples[i];
+    }
+    _filteredAltSamples[0] = getAltitude();
+    _filteredAlt = 0;
+    for (uint8_t i = 0; i < 20; i++) {
+        _filteredAlt += _filteredAltSamples[0];
+    }
+    _filteredAlt /= MAVG_SAMPLES;
 }
