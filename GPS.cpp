@@ -34,6 +34,9 @@ void GPS::update() {
         _readPacket();
         if (_validateChecksum()) {
           memcpy(&_pkt, _buf + 4, 92);
+          if (getHeight() > _maxAlt) {
+            _maxAlt = getHeight();
+          }
         }
         _headerValid = false;
       } else {
@@ -69,4 +72,13 @@ bool GPS::_validateChecksum() {
     ck_b += ck_a;
   }
   return ck_a == _buf[96] && ck_b == _buf[97];
+}
+
+void GPS::zeroAlt() {
+  _heightOffset = _pkt.height;
+  _maxAlt = 0;
+}
+
+float GPS::maxAlt() {
+  return _maxAlt;
 }

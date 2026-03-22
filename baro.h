@@ -32,6 +32,8 @@ class baro {
         float getPressure();
         float getAltitude();
         float getFilteredAltitude();
+        float getMaxAlt();
+        void zeroAlt();
         
     private:
         SPIClass* _SPI;
@@ -40,4 +42,6 @@ class baro {
         uint32_t _rawTemp, _rawPress;
         float _filteredAlt;
         float _filteredAltSamples[MAVG_SAMPLES];
+        float _maxAlt;
+        float _heightOffset;
 };

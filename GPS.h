@@ -56,6 +56,8 @@ class GPS {
     GPS(HardwareSerial* gpsSer);
     void begin();
     void update();
+    float getMaxAlt();
+    void zeroAlt();
     uint32_t getITOW() { return _pkt.iTOW; }
     uint16_t getYear() { return _pkt.year; }
     uint8_t getMonth() { return _pkt.month; }
@@ -72,7 +74,7 @@ class GPS {
     uint8_t getNumSV() { return _pkt.numSV; }
     int32_t getLon() { return _pkt.lon; }
     int32_t getLat() { return _pkt.lat; }
-    int32_t getHeight() { return _pkt.height; }
+    int32_t getHeight() { return _pkt.height - _heightOffset; }
     int32_t getHMSL() { return _pkt.hMSL; }
     uint32_t getHAcc() { return _pkt.hAcc; }
     uint32_t getVAcc() { return _pkt.vAcc; }
@@ -98,5 +100,6 @@ class GPS {
     bool _validateHeader();
     void _readPacket();
     bool _validateChecksum();
-
+    float _maxAlt;
+    float _heightOffset;
 };

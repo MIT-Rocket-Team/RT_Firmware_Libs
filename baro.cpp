@@ -100,7 +100,7 @@ uint16_t baro::getCalibrationConstant(uint8_t index) {
 }
 
 float baro::getFilteredAltitude() {
-    return _filteredAlt;
+    return _filteredAlt - _heightOffset;
 }
 
 void baro::updateAll() {
@@ -112,7 +112,20 @@ void baro::updateAll() {
     _filteredAltSamples[0] = getAltitude();
     _filteredAlt = 0;
     for (uint8_t i = 0; i < 20; i++) {
-        _filteredAlt += _filteredAltSamples[0];
+        _filteredAlt += _filteredAltSamples[i];
     }
     _filteredAlt /= MAVG_SAMPLES;
+
+    if (getFilteredAltitude() > _maxAlt) {
+        _maxAlt = getFilteredAltitude();
+    }
+}
+
+float baro::getMaxAlt() {
+    return _maxAlt;
+}
+
+void baro::zeroAlt() {
+    _heightOffset = getFilteredAltitude();
+    _maxAlt = 0;
 }
