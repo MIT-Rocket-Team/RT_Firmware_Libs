@@ -28,6 +28,18 @@ float ADXL357::getAccelZ(){
     return _accelZ;
 }
 
+int32_t ADXL357::getRawX() {
+    return _accelXraw;
+}
+
+int32_t ADXL357::getRawY() {
+    return _accelYraw;
+}
+
+int32_t ADXL357::getRawZ() {
+    return _accelZraw;
+}
+
 uint8_t ADXL357::_readReg(byte reg) {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);

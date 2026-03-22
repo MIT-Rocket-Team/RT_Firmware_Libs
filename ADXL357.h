@@ -8,6 +8,9 @@ class ADXL357 {
         float getAccelX();
         float getAccelY();
         float getAccelZ();
+        int32_t getRawX();
+        int32_t getRawY();
+        int32_t getRawZ();
         void update();
         
     private:
