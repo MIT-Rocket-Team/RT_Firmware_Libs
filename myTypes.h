@@ -6,7 +6,7 @@ enum State {
   PRE_FLIGHT,
   FLIGHT,
   APOGEE,
-  DISREEF,
+  MAIN,
   END
 };
 
