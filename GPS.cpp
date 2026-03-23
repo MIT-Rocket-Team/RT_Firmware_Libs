@@ -34,7 +34,7 @@ void GPS::update() {
         _readPacket();
         if (_validateChecksum()) {
           memcpy(&_pkt, _buf + 4, 92);
-          if (getHeight() > _maxAlt) {
+          if (getHeight() > _maxAlt && getFixType() == 3) {
             _maxAlt = getHeight();
           }
         }
