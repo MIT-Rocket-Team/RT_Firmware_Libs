@@ -45,4 +45,11 @@ typedef struct __attribute__((packed))
   float resistances[6];
 } pyroData;
 
+typedef struct {
+  float altitude;
+  float vel_z;
+  float accel_z;
+  bool apogeeReached;
+} RocketStatus;
+
 #endif
