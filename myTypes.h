@@ -50,6 +50,6 @@ typedef struct {
   float vel_z;
   float accel_z;
   bool apogeeReached;
-} RocketStatus;
+} AirbrakesData;
 
 #endif

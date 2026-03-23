@@ -1,11 +1,11 @@
-#include "AirbrakesController.h"
+#include "airbrakes.h"
 
 /* ------------------ Constructor ------------------ */
-AirbrakesController::AirbrakesController() {
+airbrakes::airbrakes() {
   begin();
 }
 
-void AirbrakesController::begin() {
+void airbrakes::begin() {
   state = DISABLED;
   deployment = 0.0f;
   datIndex = 0;
@@ -13,49 +13,49 @@ void AirbrakesController::begin() {
 }
 
 /* ------------------ Public ------------------ */
-void AirbrakesController::update(float t, const RocketStatus& status) {
+void airbrakes::update(float t, const AirbrakesData& status) {
   handleState(t, status);
 }
 
-float AirbrakesController::getDeployment() const {
+float airbrakes::getDeployment() const {
   return deployment;
 }
 
-AirbrakesControllerState AirbrakesController::getState() const {
+airbrakesState airbrakes::getState() const {
   return state;
 }
 
 /* ------------------ Servo replacement ------------------ */
-void AirbrakesController::setAirbrakesServo(float deployedFraction) {
+void airbrakes::setAirbrakesServo(float deployedFraction) {
   if (deployedFraction < 0.0f) deployedFraction = 0.0f;
   if (deployedFraction > 1.0f) deployedFraction = 1.0f;
   deployment = deployedFraction;
 }
 
 /* ------------------ Helpers ------------------ */
-float AirbrakesController::maxf(float a, float b) {
+float airbrakes::maxf(float a, float b) {
   return (a > b) ? a : b;
 }
 
 /* power funcs */
-float AirbrakesController::p4(float x){ float x2=x*x; return x2*x2; }
-float AirbrakesController::p5(float x){ return p4(x)*x; }
-float AirbrakesController::p6(float x){ float x3=x*x*x; return x3*x3; }
-float AirbrakesController::p7(float x){ return p6(x)*x; }
-float AirbrakesController::p8(float x){ float x4=p4(x); return x4*x4; }
-float AirbrakesController::p9(float x){ return p8(x)*x; }
-float AirbrakesController::p10(float x){ float x5=p5(x); return x5*x5; }
+float airbrakes::p4(float x){ float x2=x*x; return x2*x2; }
+float airbrakes::p5(float x){ return p4(x)*x; }
+float airbrakes::p6(float x){ float x3=x*x*x; return x3*x3; }
+float airbrakes::p7(float x){ return p6(x)*x; }
+float airbrakes::p8(float x){ float x4=p4(x); return x4*x4; }
+float airbrakes::p9(float x){ return p8(x)*x; }
+float airbrakes::p10(float x){ float x5=p5(x); return x5*x5; }
 
-float AirbrakesController::pow5f_fast(float x){ return p5(x); }
-float AirbrakesController::pow10f_fast(float x){ return p10(x); }
+float airbrakes::pow5f_fast(float x){ return p5(x); }
+float airbrakes::pow10f_fast(float x){ return p10(x); }
 
 /* accel model */
-float AirbrakesController::accelModel(float t, float a, float custom_t_apog) {
+float airbrakes::accelModel(float t, float a, float custom_t_apog) {
   float dt = t - custom_t_apog;
   return a * pow5f_fast(dt) - g;
 }
 
-float AirbrakesController::getR2fromFit_accel(const AirbrakesAccelerationMeasurement *data,
+float airbrakes::getR2fromFit_accel(const AirbrakesAccelerationMeasurement *data,
                                               size_t n,
                                               float a,
                                               float custom_t_apog) {
@@ -79,7 +79,7 @@ float AirbrakesController::getR2fromFit_accel(const AirbrakesAccelerationMeasure
   return 1.0f - (ss_res / ss_tot);
 }
 
-int AirbrakesController::argmax(const float *arr, size_t n) {
+int airbrakes::argmax(const float *arr, size_t n) {
   float best = arr[0];
   int idx = 0;
   for (size_t i = 1; i < n; i++) {
@@ -91,7 +91,7 @@ int AirbrakesController::argmax(const float *arr, size_t n) {
   return idx;
 }
 
-bool AirbrakesController::inverse2x2Matrix(const float A[2][2], float Ainv[2][2]) {
+bool airbrakes::inverse2x2Matrix(const float A[2][2], float Ainv[2][2]) {
   float det = A[0][0]*A[1][1] - A[0][1]*A[1][0];
   if (fabsf(det) <= 1e-6f) return false;
 
@@ -104,7 +104,7 @@ bool AirbrakesController::inverse2x2Matrix(const float A[2][2], float Ainv[2][2]
 }
 
 /* ------------------ Physics ------------------ */
-float AirbrakesController::reqDeployedAreaAirbrakes(float t_0, float deltaX) {
+float airbrakes::reqDeployedAreaAirbrakes(float t_0, float deltaX) {
   float a = coeffA;
   float b = coeffB;
   float dt = (t_0 - t_apog);
@@ -131,7 +131,7 @@ float AirbrakesController::reqDeployedAreaAirbrakes(float t_0, float deltaX) {
   return maxf(0.0f, a_0 / a_max);
 }
 
-float AirbrakesController::computeFinalAltitude_Conrad(float A, float h0, float v0) {
+float airbrakes::computeFinalAltitude_Conrad(float A, float h0, float v0) {
   float m = mass;
   float c = rho * rocketCd * a_ref / 2.0f;
   c *= cFudge;
@@ -143,7 +143,7 @@ float AirbrakesController::computeFinalAltitude_Conrad(float A, float h0, float 
   return hf - 13.0f + patchingAltitude;
 }
 
-float AirbrakesController::computeK(float Astar, float h0, float v0) {
+float airbrakes::computeK(float Astar, float h0, float v0) {
   float m = mass;
   float c = rho * rocketCd * a_ref / 2.0f;
   float alpha = rho * airbrakesCd * Astar / 2.0f;
@@ -157,16 +157,16 @@ float AirbrakesController::computeK(float Astar, float h0, float v0) {
 }
 
 /* ------------------ Start conditions ------------------ */
-bool AirbrakesController::shouldStartAirbrakesControlPrep(float t, const RocketStatus& s) {
+bool airbrakes::shouldStartAirbrakesControlPrep(float t, const AirbrakesData& s) {
   return (t > EARLIEST_AIRBRAKES_PREP_TIME) && (!s.apogeeReached) && (s.vel_z < START_AIRBRAKES_PREP_VEL);
 }
 
-bool AirbrakesController::shouldStartAirbrakesControlPreprocess(float t, const RocketStatus& s) {
+bool airbrakes::shouldStartAirbrakesControlPreprocess(float t, const AirbrakesData& s) {
   return (t > START_AIRBRAKES_PREPROC_TIME) && (!s.apogeeReached);
 }
 
 /* ------------------ STATE MACHINE ------------------ */
-void AirbrakesController::handleState(float t, const RocketStatus& status) {
+void airbrakes::handleState(float t, const AirbrakesData& status) {
 
   if (state == DISABLED) {
     setAirbrakesServo(0.0f);

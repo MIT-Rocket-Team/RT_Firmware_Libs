@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include <stddef.h>
+#include <myTypes.h>
 
 /* ------------------ Compile-time constants ------------------ */
 #define AIRBRAKES_N_MEASUREMENTS 20
@@ -30,17 +31,17 @@ typedef enum {
   CONTROLLING_PLATEAU,
   DONE,
   INFEASIBLE
-} AirbrakesControllerState;
+} airbrakesState;
 
-class AirbrakesController {
+class airbrakes {
 public:
-  AirbrakesController();
+  airbrakes();
 
   void begin();
-  void update(float currentTime, const RocketStatus& status);
+  void update(float currentTime, const AirbrakesData& status);
 
   float getDeployment() const;
-  AirbrakesControllerState getState() const;
+  airbrakesState getState() const;
 
 private:
 
@@ -87,7 +88,7 @@ private:
   float lastHf = 0;
   float lastI = 0;
 
-  AirbrakesControllerState state;
+  airbrakesState state;
   float deployment;
 
   AirbrakesAccelerationMeasurement accelData[AIRBRAKES_N_MEASUREMENTS];
@@ -126,8 +127,8 @@ private:
 
   void setAirbrakesServo(float deployedFraction);
 
-  bool shouldStartAirbrakesControlPrep(float t, const RocketStatus& s);
-  bool shouldStartAirbrakesControlPreprocess(float t, const RocketStatus& s);
+  bool shouldStartAirbrakesControlPrep(float t, const AirbrakesData& s);
+  bool shouldStartAirbrakesControlPreprocess(float t, const AirbrakesData& s);
 
-  void handleState(float t, const RocketStatus& status);
+  void handleState(float t, const AirbrakesData& status);
 };
