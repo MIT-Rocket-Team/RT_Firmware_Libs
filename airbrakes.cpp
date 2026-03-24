@@ -10,6 +10,7 @@ void airbrakes::begin() {
   deployment = 0.0f;
   datIndex = 0;
   counter = 0;
+  patchingAltitude = 0;
 }
 
 /* ------------------ Public ------------------ */
@@ -96,8 +97,8 @@ bool airbrakes::inverse2x2Matrix(const float A[2][2], float Ainv[2][2]) {
   if (fabsf(det) <= 1e-6f) return false;
 
   float f = 1.0f/det;
-  Ainv[0][0] = f*A[1][1];
-  Ainv[0][1] = -f*A[1][0];
+  Ainv[0][1] = -f*A[0][1];
+  Ainv[1][0] = -f*A[1][0];
   Ainv[1][0] = -f*A[0][1];
   Ainv[1][1] = f*A[0][0];
   return true;
@@ -175,8 +176,9 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
   }
 
   else if (state == PREP) {
-
-    if (datIndex < AIRBRAKES_N_MEASUREMENTS) {
+    uint32_t measurementTime = 0;
+    if (datIndex < AIRBRAKES_N_MEASUREMENTS && (millis() - measurementTime) >= (1/AIRBRAKES_MEASUREMENT_FREQ_HZ)) {
+      measurementTime = millis();
       accelData[datIndex] = {status.accel_z, t};
       velData[datIndex] = {status.vel_z, t};
       datIndex++;
@@ -254,10 +256,10 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
     lastA=deployment*a_max;
     float hf=computeFinalAltitude_Conrad(lastA,status.altitude,status.vel_z);
 
-    lastDeltaH=hf-predictedAlt;
+    lastDeltaH=hf-desiredAlt;
 
     float I;
-    if(((lastA>=1.0f)&&(lastDeltaH>=0))||((lastA<=1e-5)&&(lastDeltaH<0)))
+    if(((lastA/a_max>=1.0f)&&(lastDeltaH>=0))||((lastA/a_max<=1e-5)&&(lastDeltaH<0)))
       I=lastI;
     else
       I=lastI+2.0f/K*lastDeltaH;
