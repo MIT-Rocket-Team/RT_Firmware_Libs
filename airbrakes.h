@@ -9,6 +9,7 @@
 #define AIRBRAKES_SIMULATION_T_APOG 35.0f
 #define DEBUG_AIRBRAKES_ON 1
 #define AIRBRAKES_START_TIME 13.0f
+#define FLAG_DYNAMIC_DESIRED_ALTITUDE true
 
 /* ------------------ Measurements types ------------------ */
 typedef struct {

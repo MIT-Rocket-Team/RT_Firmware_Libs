@@ -217,7 +217,9 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
     float conrad=computeFinalAltitude_Conrad(0,status.altitude,status.vel_z);
     patchingAltitude=4637-conrad;
     predictedAlt=computeFinalAltitude_Conrad(0,status.altitude,status.vel_z);
-
+    if (FLAG_DYNAMIC_DESIRED_ALTITUDE) {
+      desiredAlt = floor(predictedAlt/100.0f)*100.0f;
+    }
     desiredDeltaX=predictedAlt-desiredAlt;
 
     bool tooLate=t> AIRBRAKES_START_TIME-0.25f;
