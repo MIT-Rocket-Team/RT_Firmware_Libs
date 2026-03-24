@@ -19,12 +19,13 @@ class gyro {
         int16_t getRawX();
         int16_t getRawY();
         int16_t getRawZ();
-        int16_t getDpsX();
-        int16_t getDpsY();
-        int16_t getDpsZ();
+        float getDpsX();
+        float getDpsY();
+        float getDpsZ();
         float getRoll();
         float getPitch();
         float getYaw();
+        float getRollRate();
         float getAngleFromVertical();
         void zeroRollPitchYaw();
         

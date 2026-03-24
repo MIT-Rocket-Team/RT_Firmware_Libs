@@ -60,20 +60,24 @@ int16_t gyro::getRawZ() {
     return _rawZ;
 }
 
-int16_t gyro::getDpsX() {
+float gyro::getDpsX() {
     return _rawX * 0.03051757812;
 }
 
-int16_t gyro::getDpsY() {
+float gyro::getDpsY() {
     return _rawY * 0.03051757812;
 }
 
-int16_t gyro::getDpsZ() {
+float gyro::getDpsZ() {
     return _rawZ * 0.03051757812;
 }
 
 float gyro::getRoll() {
     return _roll;
+}
+
+float gyro::getRollRate() {
+    return getDpsX() * -1.0;
 }
 
 float gyro::getPitch() {
