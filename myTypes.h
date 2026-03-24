@@ -32,10 +32,22 @@ typedef struct __attribute__((packed))
 
 typedef struct __attribute__((packed))
 {
+  bool protectionsEnabled = true;
+  bool screwSwitchEnabled = true;
+} bmsCommands;
+
+typedef struct __attribute__((packed))
+{
   bmsData BMS;
   int16_t voltages[6];
   int16_t currents[6];
 } pwrBoardData;
+
+typedef struct __attribute__((packed))
+{
+  bmsCommands BMS;
+  bool convertersEnabled[6] = {true, true, true, true, true, true}; //3V, 3.3V, 5V, 7.4V, 8.4V, 28V
+} pwrCommands;
 
 typedef struct __attribute__((packed))
 {
