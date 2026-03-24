@@ -33,6 +33,7 @@ class BQ76922 {
         bool cellUVandSC();
         bool cellSC20mV();
         uint8_t safetyStatusA();
+        uint8_t enabledProtectionsA();
 
     private:
         TwoWire* _Wire;
