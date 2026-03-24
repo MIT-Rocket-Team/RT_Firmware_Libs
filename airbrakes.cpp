@@ -1,4 +1,5 @@
 #include "airbrakes.h"
+#include "math.h"
 
 /* ------------------ Constructor ------------------ */
 airbrakes::airbrakes() {
@@ -154,7 +155,9 @@ float airbrakes::computeK(float Astar, float h0, float v0) {
   float K0 = m/2 * (-1/((c+alpha)*(c+alpha))*log(v0*v0/g/m*(c+alpha)+1)
              + 1/(c+alpha)*v0*v0/g/m/(v0*v0/g/m*(c+alpha)+1));
 
-  return K0/2.0f;
+  float ret = isnan(K0/2.0f) ? 1e10 : K0/2.0f;
+
+  return ret;
 }
 
 /* ------------------ Start conditions ------------------ */
@@ -199,7 +202,7 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
 
     for(int i=0;i<3;i++){
       float sum_num=0,sum_den=0;
-      for(int j=0;j<AIRBRAKES_N_MEASUREMENTS;j++){
+      for(int j=0;j<datIndex;j++){
         float dt=accelData[j].timeStamp-t_apog_trials[i];
         sum_den+=pow10f_fast(dt);
         sum_num+=(accelData[j].accelerationMeasurement+g)*pow5f_fast(dt);
