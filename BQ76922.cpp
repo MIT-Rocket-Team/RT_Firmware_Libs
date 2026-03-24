@@ -470,3 +470,8 @@ uint8_t BQ76922::safetyStatusA() {
     _dirCmdR(0x03, 1);
     return _buf[0];
 }
+
+uint8_t BQ76922::enabledProtectionsA() {
+    _subCmdR(0x9261);
+    return _buf[0];
+}
