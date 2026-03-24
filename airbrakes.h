@@ -87,6 +87,9 @@ private:
   float lastDeltaH = 0;
   float lastHf = 0;
   float lastI = 0;
+  
+  uint32_t lastMeasurementTimeMs = 0;
+  float desiredAlt=4550.0f;
 
   airbrakesState state;
   float deployment;

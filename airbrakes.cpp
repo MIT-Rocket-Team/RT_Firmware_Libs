@@ -176,12 +176,16 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
   }
 
   else if (state == PREP) {
-    uint32_t measurementTime = 0;
-    if (datIndex < AIRBRAKES_N_MEASUREMENTS && (millis() - measurementTime) >= (1/AIRBRAKES_MEASUREMENT_FREQ_HZ)) {
-      measurementTime = millis();
-      accelData[datIndex] = {status.accel_z, t};
-      velData[datIndex] = {status.vel_z, t};
-      datIndex++;
+    uint32_t nowMs = millis();
+    uint32_t periodMs = 1000 / AIRBRAKES_MEASUREMENT_FREQ_HZ;
+
+    if (datIndex < AIRBRAKES_N_MEASUREMENTS &&
+        (nowMs - lastMeasurementTimeMs) >= periodMs) {
+
+        lastMeasurementTimeMs = nowMs;
+        accelData[datIndex] = {status.accel_z, t};
+        velData[datIndex]   = {status.vel_z, t};
+        datIndex++;
     }
 
     if (datIndex >= AIRBRAKES_N_MEASUREMENTS) state = PREPROCESS;
@@ -206,8 +210,6 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
 
     int best=argmax(R2,3);
     t_apog=t_apog_trials[best]+AIRBRAKES_T_APOG_FUDGEDIFF;
-
-    float desiredAlt=4550.0f;
 
     float conrad=computeFinalAltitude_Conrad(0,status.altitude,status.vel_z);
     patchingAltitude=4637-conrad;
