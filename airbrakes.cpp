@@ -234,6 +234,11 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
 
   else if (state == WAIT_FOR_START) {
     if (t>=airbrakesCtrlStartTime) state=CONTROLLING_RAMP;
+
+    if (status.apogeeReached){
+      state=DONE;
+      setAirbrakesServo(0);
+    }
   }
 
   else if (state == CONTROLLING_RAMP) {
