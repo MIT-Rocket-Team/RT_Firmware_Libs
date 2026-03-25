@@ -104,6 +104,7 @@ void rollcontrol::begin() {
 
 void rollcontrol::update(float t, float h, float v, float roll, float roll_rate) {
     float v_eff = (v >= V_MIN) ? v : V_MIN;
+    v_eff = (v_eff <= V_MAX) ? v_eff : V_MAX;
     atmosphere(h);
     float mach = (a > 0.0) ? v_eff/a : 0.0;
     float CMx_a = CMx_alpha(mach);
@@ -118,7 +119,7 @@ void rollcontrol::update(float t, float h, float v, float roll, float roll_rate)
     if (unscaledAngle > 10.0) unscaledAngle = 10.0;
     if (unscaledAngle < -10.0) unscaledAngle = -10.0;
 
-    angle = unscaledAngle * 1.0 / K_servo(mach, v);
+    angle = unscaledAngle * 1.0 / K_servo(mach, v_eff);
 }
 
 float rollcontrol::getAngle() {
