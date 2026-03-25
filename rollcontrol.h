@@ -15,6 +15,7 @@
 #define n_tabs 2.0f
 
 #define V_MIN 20.0f
+#define V_MAX 1000.0f
 
 class rollcontrol {
     public:
