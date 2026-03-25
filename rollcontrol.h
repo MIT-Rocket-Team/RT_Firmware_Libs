@@ -3,8 +3,8 @@
 #define LAUNCH_ALT 271.0f
 #define LAUNCH_TEMP 290.0f
 
-#define KP 1
-#define KD 0.1
+#define KP 0.08444f
+#define KD 0.02111f
 
 #define Jxx0 0.267f
 #define Jxxf 0.241f
@@ -20,12 +20,12 @@ class rollcontrol {
     public:
         rollcontrol();
         void atmosphere(float h_m);
-        float CMx_alpha(float mach, float d);
+        float CMx_alpha(float mach);
         float CL_alpha(float mach);
         float Jxx_of_t(float t);
         float Gd(float v, float CMx_alpha, float Jxx);
         void Gd_star();
-        float K_servo(float mach);
+        float K_servo(float v, float mach);
         void update(float t, float h, float v, float roll, float roll_rate);
         float getAngle();
         void begin();

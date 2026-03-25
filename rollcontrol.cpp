@@ -59,8 +59,15 @@ void rollcontrol::atmosphere(float h_m) {
     a = sqrt(gamma * R * T);
 }
 
-float rollcontrol::CMx_alpha(float mach, float d) {
-    return CL_alpha(mach) * d * n_tabs;
+float rollcontrol::CMx_alpha(float mach) {
+    if (mach < 1) {
+        return 2.47539;
+    }
+    float p1 = 2.34725224807287;
+    float p2 = 1.04024379248907;
+    float p3 = 1.49368646930894;
+    float p4 = 0.779528950818373;
+    return p1*exp(-p2*(mach - p3)) + p4;
 }
 
 float rollcontrol::CL_alpha(float mach) {
@@ -84,14 +91,16 @@ float rollcontrol::Gd(float v, float CMx_alpha_val, float Jxx) {
 void rollcontrol::Gd_star() {
     atmosphere(h_star);
     v_star = M_star * a;
-    CMx_alpha_val = CMx_alpha(M_star, d_ref);
+    CMx_alpha_val = CMx_alpha(M_star);
     float Jxx_star = Jxx_of_t(t_b);
     Gd_star_val = Gd(v_star, CMx_alpha_val, Jxx_star);
 }
 
-float rollcontrol::K_servo(float mach) {
-    //to-do
-    return 1.0;
+float rollcontrol::K_servo(float v, float mach) {
+    float CMxa = CMx_alpha(mach);
+    float tau_alpha_proxy =  rho * v * v * CMxa;
+    float deprate =  5.5830e-07;
+    return 1.0 - deprate * tau_alpha_proxy;
 }
 
 void rollcontrol::begin() {
@@ -102,7 +111,7 @@ void rollcontrol::update(float t, float h, float v, float roll, float roll_rate)
     float v_eff = (v >= V_MIN) ? v : V_MIN;
     atmosphere(h);
     float mach = (a > 0.0) ? v_eff/a : 0.0;
-    float CMx_a = CMx_alpha(mach, d_ref);
+    float CMx_a = CMx_alpha(mach);
     float Jxx = Jxx_of_t(t);
     float Gd_val = Gd(v_eff, CMx_a, Jxx);
 
@@ -114,7 +123,7 @@ void rollcontrol::update(float t, float h, float v, float roll, float roll_rate)
     if (unscaledAngle > 10.0) unscaledAngle = 10.0;
     if (unscaledAngle < -10.0) unscaledAngle = -10.0;
 
-    angle = unscaledAngle * 1.0 / K_servo(mach);
+    angle = unscaledAngle * 1.0 / K_servo(mach, v);
 }
 
 float rollcontrol::getAngle() {
