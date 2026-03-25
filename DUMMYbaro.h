@@ -19,9 +19,9 @@
 
 #define MAVG_SAMPLES 20
 
-class baro {
+class DUMMYbaro {
     public:
-        baro(SPIClass* SPI, SPISettings settings, int cs);
+        DUMMYbaro(SPIClass* SPI, SPISettings settings, int cs);
         void begin();
         void updateRawTemp();
         void updateRawPress();
@@ -34,7 +34,7 @@ class baro {
         float getFilteredAltitude();
         float getMaxAlt();
         void zeroAlt();
-        void updateAll();
+        void updateAll(uint32_t simTime);
         
     private:
         SPIClass* _SPI;

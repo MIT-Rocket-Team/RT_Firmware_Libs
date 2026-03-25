@@ -1,23 +1,26 @@
 #include "Arduino.h"
 #include "SPI.h"
-#include "baro.h"
+#include "DUMMYbaro.h"
+
+//_filteredAlt
+static float dummyData[10000];
 
 float dT, TEMP, P;
 int64_t OFF, SENS;
 const float P0 = 1013.25;
 
-baro::baro(SPIClass* SPI, SPISettings settings, int cs) {
+DUMMYbaro::DUMMYbaro(SPIClass* SPI, SPISettings settings, int cs) {
     _SPI = SPI;
     _settings = settings;
     _cs = cs;
 }
 
-void baro::begin(){
+void DUMMYbaro::begin(){
     pinMode(_cs, OUTPUT);
     digitalWrite(_cs, 1);
 }
 
-void baro::updateRawPress() {
+void DUMMYbaro::updateRawPress() {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
     _SPI->transfer(0x42);
@@ -35,7 +38,7 @@ void baro::updateRawPress() {
     digitalWrite(_cs, 1);
 }
 
-void baro::updateRawTemp() {
+void DUMMYbaro::updateRawTemp() {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
     _SPI->transfer(0x52);
@@ -53,21 +56,21 @@ void baro::updateRawTemp() {
     digitalWrite(_cs, 1);
 }
 
-uint32_t baro::getRawTemp() {
+uint32_t DUMMYbaro::getRawTemp() {
     return _rawTemp;
 }
 
-uint32_t baro::getRawPress() {
+uint32_t DUMMYbaro::getRawPress() {
     return _rawPress;
 }
 
-float baro::getTemperature(){
+float DUMMYbaro::getTemperature(){
     dT = (float)_rawTemp - ((float)C5)*((int)1<<8);
     TEMP = 2000.0 + dT * ((float)C6)/(float)((long)1<<23);
     return TEMP/100;
 }
 
-float baro::getPressure() {
+float DUMMYbaro::getPressure() {
     dT = (float)_rawTemp - ((float)C5)*((int)1<<8);
     TEMP = 2000.0 + dT * ((float)C6)/(float)((long)1<<23);
     OFF = (((int64_t)C2)*((long)1<<17)) + dT * ((float)C4)/((int)1<<6);
@@ -80,7 +83,7 @@ float baro::getPressure() {
     return P/100;
 }
 
-float baro::getAltitude() {
+float DUMMYbaro::getAltitude() {
     float h,t,p;
     t = getTemperature();
     p = getPressure();
@@ -89,7 +92,7 @@ float baro::getAltitude() {
     return h;
 }
 
-uint16_t baro::getCalibrationConstant(uint8_t index) {
+uint16_t DUMMYbaro::getCalibrationConstant(uint8_t index) {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
     _SPI->transfer(0b10100000 | (index << 1));
@@ -99,11 +102,11 @@ uint16_t baro::getCalibrationConstant(uint8_t index) {
     return res;
 }
 
-float baro::getFilteredAltitude() {
+float DUMMYbaro::getFilteredAltitude() {
     return _filteredAlt - _heightOffset;
 }
 
-void baro::updateAll() {
+void DUMMYbaro::updateAll(uint32_t simTime) {
     updateRawTemp();
     updateRawPress();
     for(int8_t i = MAVG_SAMPLES - 2; i > - 1; i--) {
@@ -116,16 +119,18 @@ void baro::updateAll() {
     }
     _filteredAlt /= MAVG_SAMPLES;
 
+    _filteredAlt = dummyData[simTime / 10];
+
     if (getFilteredAltitude() > _maxAlt) {
         _maxAlt = getFilteredAltitude();
     }
 }
 
-float baro::getMaxAlt() {
+float DUMMYbaro::getMaxAlt() {
     return _maxAlt;
 }
 
-void baro::zeroAlt() {
+void DUMMYbaro::zeroAlt() {
     _heightOffset = getFilteredAltitude();
     _maxAlt = 0;
 }

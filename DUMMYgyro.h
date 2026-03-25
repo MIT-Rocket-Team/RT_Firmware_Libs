@@ -10,12 +10,12 @@
 #define GYRO_ZOUT_L 0x48
 #define GYRO_ZOUT_H 0x47
 
-class gyro {
+class DUMMYgyro {
     public:
-        gyro(SPIClass* SPI, SPISettings settings, int cs);
+        DUMMYgyro(SPIClass* SPI, SPISettings settings, int cs);
         void begin();
         void config();
-        void update();
+        void update(uint32_t simTime);
         int16_t getRawX();
         int16_t getRawY();
         int16_t getRawZ();

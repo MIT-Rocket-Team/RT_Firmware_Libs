@@ -1,14 +1,17 @@
 #include "Arduino.h"
 #include "SPI.h"
-#include "ADXL357.h"
+#include "DUMMYADXL357.h"
 
-ADXL357::ADXL357(SPIClass* SPI, SPISettings settings, int cs) {
+//_verticalAccelMinusGravity
+static float dummyData[10000];
+
+DUMMYADXL357::DUMMYADXL357(SPIClass* SPI, SPISettings settings, int cs) {
     _SPI = SPI;
     _settings = settings;
     _cs = cs;
 }
 
-void ADXL357::setup(){
+void DUMMYADXL357::setup(){
     pinMode(_cs, OUTPUT);
     digitalWrite(_cs, 1);
     _writeReg(0x28, 0b00000011);
@@ -16,31 +19,31 @@ void ADXL357::setup(){
     _writeReg(0x2C, 0b10000011);
 }
 
-float ADXL357::getAccelX(){
+float DUMMYADXL357::getAccelX(){
     return _accelX;
 }
 
-float ADXL357::getAccelY(){
+float DUMMYADXL357::getAccelY(){
     return _accelY;
 }
 
-float ADXL357::getAccelZ(){
+float DUMMYADXL357::getAccelZ(){
     return _accelZ;
 }
 
-int32_t ADXL357::getRawX() {
+int32_t DUMMYADXL357::getRawX() {
     return _accelXraw;
 }
 
-int32_t ADXL357::getRawY() {
+int32_t DUMMYADXL357::getRawY() {
     return _accelYraw;
 }
 
-int32_t ADXL357::getRawZ() {
+int32_t DUMMYADXL357::getRawZ() {
     return _accelZraw;
 }
 
-uint8_t ADXL357::_readReg(byte reg) {
+uint8_t DUMMYADXL357::_readReg(byte reg) {
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
     _SPI->transfer((reg << 1) | 1);
@@ -50,12 +53,12 @@ uint8_t ADXL357::_readReg(byte reg) {
     return data;
 }
 
-bool ADXL357::_dataReady(){
+bool DUMMYADXL357::_dataReady(){
     uint8_t data = _readReg(0x04);
     return data & 1;
 }
 
-void ADXL357::update(State rocketState) {
+void DUMMYADXL357::update(State rocketState, uint32_t simTime) {
     if(_dataReady()){
         uint8_t data[10];
         data[0] = (0x08 << 1) | 1;
@@ -75,7 +78,7 @@ void ADXL357::update(State rocketState) {
         _accelZraw = ((int32_t) (_accelZraw << 12)) >> 12;
         _accelZ = _accelZraw / 12800.0 * 9.80665;
 
-        _verticalAccelMinusGravity = _accelX - 9.8065;
+        _verticalAccelMinusGravity = dummyData[simTime / 10];
 
         uint32_t now = micros();
         //Only integrate if above threshold in pre-flight
@@ -90,7 +93,7 @@ void ADXL357::update(State rocketState) {
     }
 }
 
-void ADXL357::_writeReg(byte reg, byte val) {
+void DUMMYADXL357::_writeReg(byte reg, byte val) {
     _SPI->beginTransaction(_settings);
     digitalWrite(_cs, 0);
     _SPI->transfer(reg << 1);
@@ -99,14 +102,14 @@ void ADXL357::_writeReg(byte reg, byte val) {
     _SPI->endTransaction();
 }
 
-float ADXL357::getVerticalAccelMinusGravity() {
+float DUMMYADXL357::getVerticalAccelMinusGravity() {
     return _verticalAccelMinusGravity;
 }
 
-float ADXL357::getIntegratedVelo() {
+float DUMMYADXL357::getIntegratedVelo() {
     return _integratedVelo;
 }
 
-void ADXL357::zeroIntegratedVelo() {
+void DUMMYADXL357::zeroIntegratedVelo() {
     _integratedVelo = 0;
 }

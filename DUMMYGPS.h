@@ -51,11 +51,11 @@ typedef struct __attribute__((packed))
 } ubx_nav_pvt_t;
 
 
-class GPS {
+class DUMMYGPS {
   public:
-    GPS(HardwareSerial* gpsSer);
+    DUMMYGPS(HardwareSerial* gpsSer);
     void begin();
-    void update();
+    void update(uint32_t simTime);
     float getMaxAlt();
     void zeroAlt();
     uint32_t getITOW() { return _pkt.iTOW; }

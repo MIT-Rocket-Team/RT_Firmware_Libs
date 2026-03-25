@@ -4,9 +4,9 @@
 
 #define ACCEL_PREFLIGHT_INTEGRATION_THRESHOLD 10
 
-class ADXL357 {
+class DUMMYADXL357 {
     public:
-        ADXL357(SPIClass* SPI, SPISettings settings, int cs);
+        DUMMYADXL357(SPIClass* SPI, SPISettings settings, int cs);
         void setup();
         float getAccelX();
         float getAccelY();
@@ -14,7 +14,7 @@ class ADXL357 {
         int32_t getRawX();
         int32_t getRawY();
         int32_t getRawZ();
-        void update(State rocketState);
+        void update(State rocketState, uint32_t simTime);
         float getVerticalAccelMinusGravity();
         float getIntegratedVelo();
         void zeroIntegratedVelo();

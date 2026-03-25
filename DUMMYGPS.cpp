@@ -1,16 +1,19 @@
 #include "Arduino.h"
-#include "GPS.h"
+#include "DUMMYGPS.h"
 
 uint8_t GPS_10HZ[14] = {0xB5,0x62,0x06,0x08,0x06,0x00,0x64,0x00,0x01,0x00,0x01,0x00,0x7A,0x12};
 uint8_t GPS_UBX_ENABLE[16] = {0xB5,0x62,0x06,0x01,0x08,0x00,0x01,0x07,0x00,0x01,0x00,0x00,0x00,0x00,0x18,0xE1};
 uint8_t GPS_SERIAL_CONFIG[28] = {0xB5,0x62,0x06,0x00,0x14,0x00,0x01,0x00,0x00,0x00,0xD0,0x08,0x00,0x00,0x00,0xC2,0x01,0x00,0x07,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0xBE,0x72};
 uint8_t GPS_CONFIG_UPDATE[9] = {0xB5,0x62,0x06,0x00,0x01,0x00,0x01,0x08,0x22};
 
-GPS::GPS(HardwareSerial* gpsSer){
+//_pkt.height
+static float dummyData[10000];
+
+DUMMYGPS::DUMMYGPS(HardwareSerial* gpsSer){
   _gpsSer = gpsSer;
 }
 
-void GPS::begin() {
+void DUMMYGPS::begin() {
   _gpsSer->begin(9600);
   _gpsSer->write(GPS_10HZ, 14);
   _gpsSer->write(GPS_UBX_ENABLE, 16);
@@ -20,7 +23,7 @@ void GPS::begin() {
   _gpsSer->begin(115200);
 }
 
-void GPS::update() {
+void DUMMYGPS::update(uint32_t simTime) {
   bool endLoop = false;
   while (_gpsSer->available() >= 6 && !endLoop) {
     if (!_headerValid) {
@@ -34,6 +37,8 @@ void GPS::update() {
         _readPacket();
         if (_validateChecksum()) {
           memcpy(&_pkt, _buf + 4, 92);
+          _pkt.height = dummyData[simTime / 10];
+          _pkt.fixType = 3;
           if (getHeight() > _maxAlt && getFixType() == 3) {
             _maxAlt = getHeight();
           }
@@ -47,7 +52,7 @@ void GPS::update() {
   }
 }
 
-bool GPS::_validateHeader() {
+bool DUMMYGPS::_validateHeader() {
   if (_gpsSer->read() != 0xB5) return false;
   if (_gpsSer->read() != 0x62) return false;
   if (_gpsSer->read() != 0x01) return false;
@@ -57,7 +62,7 @@ bool GPS::_validateHeader() {
   return true;
 }
 
-void GPS::_readPacket() {
+void DUMMYGPS::_readPacket() {
   _gpsSer->readBytes(_buf + 4, 94);
   _buf[0] = 0x01;
   _buf[1] = 0x07;
@@ -65,7 +70,7 @@ void GPS::_readPacket() {
   _buf[3] = 0x00;
 }
 
-bool GPS::_validateChecksum() {
+bool DUMMYGPS::_validateChecksum() {
   uint8_t ck_a = 0, ck_b = 0;
   for (int i = 0; i < 96; i++) {
     ck_a += _buf[i];
@@ -74,11 +79,11 @@ bool GPS::_validateChecksum() {
   return ck_a == _buf[96] && ck_b == _buf[97];
 }
 
-void GPS::zeroAlt() {
+void DUMMYGPS::zeroAlt() {
   _heightOffset = _pkt.height;
   _maxAlt = 0;
 }
 
-float GPS::getMaxAlt() {
+float DUMMYGPS::getMaxAlt() {
   return _maxAlt;
 }
