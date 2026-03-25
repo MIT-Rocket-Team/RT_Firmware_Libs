@@ -25,6 +25,7 @@ vtx::vtx(HardwareSerial* ser) {
 
 void vtx::begin() {
     _ser->begin(4800, SERIAL_8N2);
+    setPower(0);
 }
 
 uint8_t vtx::_crc(uint8_t *data, uint8_t len) {
