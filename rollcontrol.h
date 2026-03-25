@@ -21,7 +21,6 @@ class rollcontrol {
         rollcontrol();
         void atmosphere(float h_m);
         float CMx_alpha(float mach);
-        float CL_alpha(float mach);
         float Jxx_of_t(float t);
         float Gd(float v, float CMx_alpha, float Jxx);
         void Gd_star();

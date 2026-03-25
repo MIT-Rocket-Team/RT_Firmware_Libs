@@ -70,11 +70,6 @@ float rollcontrol::CMx_alpha(float mach) {
     return p1*exp(-p2*(mach - p3)) + p4;
 }
 
-float rollcontrol::CL_alpha(float mach) {
-    //to-do
-    return 1.0;
-}
-
 float rollcontrol::Jxx_of_t(float t) {
     if (t <= 0.0)  return Jxx0;
     if (t >= t_b)  return Jxxf;
