@@ -215,7 +215,7 @@ void airbrakes::handleState(float t, const AirbrakesData& status) {
     t_apog=t_apog_trials[best]+AIRBRAKES_T_APOG_FUDGEDIFF;
 
     float conrad=computeFinalAltitude_Conrad(0,status.altitude,status.vel_z);
-    patchingAltitude=4637-conrad;
+    patchingAltitude=SIM_PREDICTED_ALTITUDE-conrad;
     predictedAlt=computeFinalAltitude_Conrad(0,status.altitude,status.vel_z);
     if (FLAG_DYNAMIC_DESIRED_ALTITUDE) {
       desiredAlt = floor(predictedAlt/100.0f)*100.0f;
