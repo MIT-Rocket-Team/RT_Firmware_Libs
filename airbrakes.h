@@ -10,7 +10,7 @@
 #define DEBUG_AIRBRAKES_ON 1
 #define AIRBRAKES_START_TIME 13.0f
 #define FLAG_DYNAMIC_DESIRED_ALTITUDE true
-#define SIM_PREDICTED_ALTITUDE 4546.0f
+#define SIM_PREDICTED_ALTITUDE 5046.0f
 
 /* ------------------ Measurements types ------------------ */
 typedef struct {
