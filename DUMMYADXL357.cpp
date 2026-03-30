@@ -84,10 +84,10 @@ void DUMMYADXL357::update(State rocketState, uint32_t simTime) {
         //Only integrate if above threshold in pre-flight
         if (rocketState == PRE_FLIGHT) {
             if (_verticalAccelMinusGravity > ACCEL_PREFLIGHT_INTEGRATION_THRESHOLD) {
-                _integratedVelo = _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
+                _integratedVelo += _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
             }
         } else {
-            _integratedVelo = _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
+            _integratedVelo += _verticalAccelMinusGravity * (now - _lastUpdate) / 1000000.0;
         }
         _lastUpdate = now;
     }
