@@ -119,7 +119,7 @@ void rollcontrol::update(float t, float h, float v, float roll, float roll_rate)
     if (unscaledAngle > 10.0) unscaledAngle = 10.0;
     if (unscaledAngle < -10.0) unscaledAngle = -10.0;
 
-    angle = unscaledAngle * 1.0 / K_servo(mach, v_eff);
+    angle = unscaledAngle * 1.0 / K_servo(v_eff, mach);
 }
 
 float rollcontrol::getAngle() {
