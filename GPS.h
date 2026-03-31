@@ -74,7 +74,7 @@ class GPS {
     uint8_t getNumSV() { return _pkt.numSV; }
     int32_t getLon() { return _pkt.lon; }
     int32_t getLat() { return _pkt.lat; }
-    int32_t getHeight() { return _pkt.height - _heightOffset; }
+    float getHeight() { return (_pkt.height - _heightOffset) / 1000.0; }
     int32_t getHMSL() { return _pkt.hMSL; }
     uint32_t getHAcc() { return _pkt.hAcc; }
     uint32_t getVAcc() { return _pkt.vAcc; }
