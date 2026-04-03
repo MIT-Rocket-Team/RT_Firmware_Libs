@@ -56,7 +56,7 @@ bool ADXL357::_dataReady(){
 }
 
 void ADXL357::update(State rocketState) {
-    if(true){
+    if(_dataReady()){
         uint8_t data[10];
         data[0] = (0x08 << 1) | 1;
         digitalWrite(_cs, 0);
