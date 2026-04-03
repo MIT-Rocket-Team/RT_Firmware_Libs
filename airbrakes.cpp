@@ -135,9 +135,9 @@ float airbrakes::reqDeployedAreaAirbrakes(float t_0, float deltaX) {
   float a_0 = local_fudge * 2.0f * mass * g * deltaX / denom;
   float tentative = minf(maxf(0.0f, a_0 / a_max),1.0f);
   if (tentative == 0.0f) {
-    tentative = 1.0f // to have it deploy : )
+    tentative = 1.0f; // to have it deploy : )
   }
-  return tentative
+  return tentative;
 }
 
 float airbrakes::computeFinalAltitude_Conrad(float A, float h0, float v0) {
