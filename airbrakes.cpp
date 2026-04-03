@@ -38,6 +38,9 @@ void airbrakes::setAirbrakesServo(float deployedFraction) {
 float airbrakes::maxf(float a, float b) {
   return (a > b) ? a : b;
 }
+float airbrakes::minf(float a, float b) {
+  return (a < b) ? a : b;
+}
 
 /* power funcs */
 float airbrakes::p4(float x){ float x2=x*x; return x2*x2; }
@@ -130,7 +133,11 @@ float airbrakes::reqDeployedAreaAirbrakes(float t_0, float deltaX) {
   if (denom == 0.0f || a_max == 0.0f) return 0.0f;
 
   float a_0 = local_fudge * 2.0f * mass * g * deltaX / denom;
-  return maxf(0.0f, a_0 / a_max);
+  float tentative = minf(maxf(0.0f, a_0 / a_max),1.0f);
+  if (tentative == 0.0f) {
+    tentative = 1.0f // to have it deploy : )
+  }
+  return tentative
 }
 
 float airbrakes::computeFinalAltitude_Conrad(float A, float h0, float v0) {
