@@ -69,7 +69,7 @@ void ADXL357::update(State rocketState) {
                ((int32_t)data[2] << 4)  |
                ((int32_t)(data[3] & 0xF0) >> 4);
         _accelXraw = ((int32_t) (_accelXraw << 12)) >> 12;
-        _accelX = _accelXraw / 12800.0 * 9.80665;
+        _accelX = _accelXraw / 12800.0 * 9.80665 * 1.060;
         _accelYraw = ((int32_t)data[4] << 12) |
                ((int32_t)data[5] << 4)  |
                ((int32_t)(data[6] & 0xF0) >> 4);
