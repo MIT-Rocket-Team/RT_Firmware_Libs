@@ -56,7 +56,7 @@ bool ADXL357::_dataReady(){
 }
 
 void ADXL357::update(State rocketState) {
-    if(_dataReady()){
+    if(true){
         uint8_t data[10];
         data[0] = (0x08 << 1) | 1;
         digitalWrite(_cs, 0);
@@ -65,13 +65,19 @@ void ADXL357::update(State rocketState) {
         _SPI->endTransaction();
         digitalWrite(_cs, 1);
 
-        _accelXraw = ((data[1] << 16) + (data[2] << 8)+(data[3])) >> 4;
+        _accelXraw = ((int32_t)data[1] << 12) |
+               ((int32_t)data[2] << 4)  |
+               ((int32_t)(data[3] & 0xF0) >> 4);
         _accelXraw = ((int32_t) (_accelXraw << 12)) >> 12;
         _accelX = _accelXraw / 12800.0 * 9.80665;
-        _accelYraw = ((data[4] << 16) + (data[5] << 8)+(data[6])) >> 4;
+        _accelYraw = ((int32_t)data[4] << 12) |
+               ((int32_t)data[5] << 4)  |
+               ((int32_t)(data[6] & 0xF0) >> 4);
         _accelYraw = ((int32_t) (_accelYraw << 12)) >> 12;
         _accelY = _accelYraw / 12800.0 * 9.80665;
-        _accelZraw = ((data[7] << 16) + (data[8] << 8)+(data[9])) >> 4;
+        _accelZraw = ((int32_t)data[7] << 12) |
+               ((int32_t)data[8] << 4)  |
+               ((int32_t)(data[9] & 0xF0) >> 4);
         _accelZraw = ((int32_t) (_accelZraw << 12)) >> 12;
         _accelZ = _accelZraw / 12800.0 * 9.80665;
 
