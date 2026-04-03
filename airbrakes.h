@@ -104,6 +104,7 @@ private:
 
   /* helpers */
   float maxf(float a, float b);
+  float minf(float a, float b);
 
   float p4(float x);
   float p5(float x);
