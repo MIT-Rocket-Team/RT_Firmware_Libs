@@ -59,7 +59,7 @@ bool DUMMYADXL357::_dataReady(){
 }
 
 void DUMMYADXL357::update(State rocketState, uint32_t simTime) {
-    if(_dataReady()){
+    if(true){
         uint8_t data[10];
         data[0] = (0x08 << 1) | 1;
         digitalWrite(_cs, 0);
