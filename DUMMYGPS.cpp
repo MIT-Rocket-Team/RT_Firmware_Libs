@@ -37,7 +37,7 @@ void DUMMYGPS::update(uint32_t simTime) {
         _readPacket();
         if (_validateChecksum()) {
           memcpy(&_pkt, _buf + 4, 92);
-          _pkt.height = dummyData[simTime / 10];
+          _pkt.height = dummyData[simTime / 10] * 1000.0;
           _pkt.fixType = 3;
           if (getHeight() > _maxAlt && getFixType() == 3) {
             _maxAlt = getHeight();
