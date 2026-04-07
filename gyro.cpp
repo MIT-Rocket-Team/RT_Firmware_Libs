@@ -61,15 +61,15 @@ int16_t gyro::getRawZ() {
 }
 
 float gyro::getDpsX() {
-    return _rawX * 0.03051757812;
+    return _rawX * 0.03051757812 - GYRO_OFFSET_ROLL_DPS;
 }
 
 float gyro::getDpsY() {
-    return _rawY * 0.03051757812;
+    return _rawY * 0.03051757812 - GYRO_OFFSET_PITCH_DPS;
 }
 
 float gyro::getDpsZ() {
-    return _rawZ * 0.03051757812;
+    return _rawZ * 0.03051757812 - GYRO_OFFSET_YAW_DPS;
 }
 
 float gyro::getRoll() {

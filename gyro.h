@@ -10,6 +10,10 @@
 #define GYRO_ZOUT_L 0x48
 #define GYRO_ZOUT_H 0x47
 
+#define GYRO_OFFSET_ROLL_DPS -0.0801f
+#define GYRO_OFFSET_PITCH_DPS 0.8358f
+#define GYRO_OFFSET_YAW_DPS 0.7640f
+
 class gyro {
     public:
         gyro(SPIClass* SPI, SPISettings settings, int cs);
