@@ -25,6 +25,8 @@ class CC1200 {
         void sineWave();
         void flushRx();
         void flushTx();
+        void freq915();
+        void freq917();
     private:
         SPIClass* _SPI;
         SPISettings _settings;
