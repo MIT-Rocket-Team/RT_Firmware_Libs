@@ -270,8 +270,8 @@ void CC1200::freq915() {
     _writeReg(0x2F0E,0x00);
 }
         
-void CC1200::freq917() {
-    _writeReg(0x2F0C,0x5B);
-    _writeReg(0x2F0D,0x80);
-    _writeReg(0x2F0E,0x33);
+void CC1200::freq920() {
+    _writeReg(0x2F0C,0x5C);
+    _writeReg(0x2F0D,0x00);
+    _writeReg(0x2F0E,0x00);
 }
