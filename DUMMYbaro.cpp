@@ -134,3 +134,7 @@ void DUMMYbaro::zeroAlt() {
     _heightOffset = getFilteredAltitude();
     _maxAlt = 0;
 }
+
+void DUMMYbaro::resetMaxAlt() {
+    _maxAlt = 0;
+}

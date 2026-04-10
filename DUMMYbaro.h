@@ -26,6 +26,7 @@ class DUMMYbaro {
         float getMaxAlt();
         void zeroAlt();
         void updateAll(uint32_t simTime);
+        void resetMaxAlt();
         
     private:
         SPIClass* _SPI;
