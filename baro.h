@@ -26,6 +26,7 @@ class baro {
         float getMaxAlt();
         void zeroAlt();
         void updateAll();
+        void resetMaxAlt();
         
     private:
         SPIClass* _SPI;

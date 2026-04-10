@@ -129,3 +129,7 @@ void baro::zeroAlt() {
     _heightOffset = getFilteredAltitude();
     _maxAlt = 0;
 }
+
+void baro::resetMaxAlt() {
+    _maxAlt = 0;
+}
