@@ -103,7 +103,7 @@ bool airbrakes::inverse2x2Matrix(const float A[2][2], float Ainv[2][2]) {
   float f = 1.0f/det;
   Ainv[0][1] = -f*A[0][1];
   Ainv[1][0] = -f*A[1][0];
-  Ainv[1][0] = -f*A[0][1];
+  Ainv[0][0] = f*A[1][1];
   Ainv[1][1] = f*A[0][0];
   return true;
 }
