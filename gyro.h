@@ -10,9 +10,9 @@
 #define GYRO_ZOUT_L 0x48
 #define GYRO_ZOUT_H 0x47
 
-#define GYRO_OFFSET_ROLL_DPS -0.0801f
-#define GYRO_OFFSET_PITCH_DPS 0.8358f
-#define GYRO_OFFSET_YAW_DPS 0.7640f
+#define GYRO_OFFSET_ROLL_DPS -2.6575f
+#define GYRO_OFFSET_PITCH_DPS 0.824f
+#define GYRO_OFFSET_YAW_DPS 1.475f
 
 class gyro {
     public:
