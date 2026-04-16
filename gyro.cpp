@@ -17,8 +17,10 @@ void gyro::begin() {
 
 void gyro::_writeReg(byte reg, byte val) {
     digitalWrite(_cs, 0);
+    _SPI->beginTransaction(_settings);
     _SPI->transfer(reg);
     _SPI->transfer(val);
+    _SPI->endTransaction();
     digitalWrite(_cs, 1);
 }
 
