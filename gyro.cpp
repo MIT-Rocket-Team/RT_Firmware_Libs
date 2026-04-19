@@ -15,7 +15,18 @@ void gyro::begin() {
     digitalWrite(_cs, 1);
 }
 
+uint8_t gyro::readReg(uint8_t reg) {
+    digitalWrite(_cs, 0);
+    _SPI->beginTransaction(_settings);
+    _SPI->transfer(READ | reg);
+    uint8_t data = _SPI->transfer(0x00);
+    _SPI->endTransaction();
+    digitalWrite(_cs, 1);
+    return data;
+}
+
 void gyro::_writeReg(byte reg, byte val) {
+    delay(10);
     digitalWrite(_cs, 0);
     _SPI->beginTransaction(_settings);
     _SPI->transfer(reg);

@@ -10,9 +10,9 @@
 #define GYRO_ZOUT_L 0x48
 #define GYRO_ZOUT_H 0x47
 
-#define GYRO_OFFSET_ROLL_DPS -2.6575f
-#define GYRO_OFFSET_PITCH_DPS 0.824f
-#define GYRO_OFFSET_YAW_DPS 1.475f
+#define GYRO_OFFSET_ROLL_DPS -0.2525f
+#define GYRO_OFFSET_PITCH_DPS 0.2441f
+#define GYRO_OFFSET_YAW_DPS 0.4376f
 
 class gyro {
     public:
@@ -32,6 +32,7 @@ class gyro {
         float getRollRate();
         float getAngleFromVertical();
         void zeroRollPitchYaw();
+        uint8_t readReg(uint8_t reg);
         
     private:
         SPIClass* _SPI;
