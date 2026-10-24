@@ -12,6 +12,8 @@ void ADS1220::setup() {
     //Set cs pin as output and set it high
     
     //Begin _SPI, and run beginTransaction with _settings
+
+    //Set AINP = AIN1, AINN = AIN2, gain = 128, PGA enabled (Configuration Register 0)
     
     //Set the ADS1220 in continuous conversion mode in normal mode at 175SPS (Configuration Register 1)
     
