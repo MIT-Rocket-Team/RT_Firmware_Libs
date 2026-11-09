@@ -5,7 +5,7 @@
 
 class pyro {
     public:
-        pyro();
+        pyro(uint8_t numPyros, uint8_t firePins[], uint8_t adca[], uint8_t adcb[], uint8_t sens[]);
         void begin();
         bool connected(uint8_t channel);
         float resistance(uint8_t channel);
@@ -20,8 +20,13 @@ class pyro {
         void _setPyroStatus(uint8_t channel, PyroStatus val);
 
     private:
-        bool _armed[6];
-        bool _fired[6];
-        uint32_t _firedTimes[6];
-        uint16_t _pyroStatus;
+        bool _armed[16];
+        bool _fired[16];
+        uint32_t _firedTimes[16];
+        uint32_t _pyroStatus;
+        uint8_t _numPyros;
+        uint8_t* _firePins;
+        uint8_t* _adca;
+        uint8_t* _adcb;
+        uint8_t* _sens;
 };
