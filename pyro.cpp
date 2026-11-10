@@ -1,37 +1,32 @@
 #include "pyro.h"
 
-#ifdef PE10
-
-int adca[6] = {PB1, PB0, PC5, PC4, PA7, PA6};
-int adcb[6] = {PC0, PC1, PA0, PA1, PA2, PA3};
-int firePins[6] = {PB3, PB5, PB6, PB7, PB8, PB9};
-int sens[6] = {PE15, PE14, PE13, PE12, PE11, PE10};
-
-#else
-int adca[6];
-int adcb[6];
-int firePins[6];
-int sens[6];
-
-#endif
-
-
-pyro::pyro() {
+pyro::pyro(uint8_t numPyros, uint8_t firePins[], uint8_t adca[], uint8_t adcb[], uint8_t sens[]) {
+    _numPyros = numPyros;
+    _firePins = firePins;
+    _adca = adca;
+    _adcb = adcb;
+    _sens = sens;
+    for (int i = 0; i < 16; i++) {
+        _armed[i] = false;
+        _fired[i] = false;
+        _firedTimes[i] = 0;
+    }
+    _pyroStatus = 0;
 }
 
 void pyro::begin() {    
-    for (int i = 0; i < 6; i++) {
-        pinMode(firePins[i], OUTPUT);
-        pinMode(sens[i], INPUT);
+    for (int i = 0; i < _numPyros; i++) {
+        pinMode(_firePins[i], OUTPUT);
+        pinMode(_sens[i], INPUT);
     }
 }
 
 bool pyro::connected(uint8_t channel) {
-    return digitalRead(sens[channel]);
+    return digitalRead(_sens[channel]);
 }
 
 float pyro::resistance(uint8_t channel) {
-    return 0.5 * (((float) analogRead(adcb[channel])) / ((float)analogRead(adca[channel])));
+    return 0.5 * (((float) analogRead(_adcb[channel])) / ((float)analogRead(_adca[channel])));
 }
 
 void pyro::arm(uint8_t channel) {
@@ -40,7 +35,7 @@ void pyro::arm(uint8_t channel) {
 
 void pyro::fire(uint8_t channel) {
     if (_armed[channel]) {
-        digitalWrite(firePins[channel], HIGH);
+        digitalWrite(_firePins[channel], HIGH);
         _firedTimes[channel] = millis();
         _fired[channel] = true;
         _armed[channel] = false;
@@ -48,7 +43,7 @@ void pyro::fire(uint8_t channel) {
 }
 
 void pyro::off(uint8_t channel) {
-    digitalWrite(firePins[channel], LOW);
+    digitalWrite(_firePins[channel], LOW);
     _fired[channel] = false;
 }
 
@@ -69,7 +64,7 @@ PyroStatus pyro::getPyroStatus(uint8_t channel) {
 }
 
 void pyro::update(State rocketState) {
-    for (uint8_t i = 0; i < 6; i++) {
+    for (uint8_t i = 0; i < _numPyros; i++) {
         //turn off pyros if they have been on for > PYRO_FIRE_DURATION
         if (_fired[i] && millis() - _firedTimes[i] > PYRO_FIRE_DURATION) {
             off(i);
