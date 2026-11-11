@@ -3,14 +3,14 @@
 
 class vtx {
     public:
-        vtx(HardwareSerial* ser);
+        vtx(Uart* ser);
         void begin();
         void getSettings();
         void setPower(uint8_t power);
         void setFreq(uint16_t freq);
 
     private:
-        HardwareSerial* _ser;
+        Uart* _ser;
         uint8_t _crc(uint8_t *data, uint8_t len);
         void _sendFrame(uint8_t cmd, uint8_t *data, uint8_t len);
 };

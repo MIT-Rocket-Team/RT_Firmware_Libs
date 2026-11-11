@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "SINAT485.h"
 
-SINAT485::SINAT485(HardwareSerial* incloSer){
+SINAT485::SINAT485(Uart* incloSer){
   _incloSer = incloSer;
 }
 

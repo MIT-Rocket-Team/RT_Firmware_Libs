@@ -1,0 +1,72 @@
+name: Build RT_Arduino Sketches
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build RT_Arduino Sketches
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Check out RT_Firmware_Libs
+        uses: actions/checkout@v4
+        with:
+          path: external/RT_Firmware_Libs
+
+      - name: Check out RT_Arduino
+        uses: actions/checkout@v4
+        with:
+          repository: MIT-Rocket-Team/RT_Arduino
+          path: RT_Arduino
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Cache Arduino and STM32duino packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.arduino15
+            ~/.Arduino_Core_STM32_dl
+          key: ${{ runner.os }}-stm32duino-3.0.0
+
+      - name: Install STM32duino core
+        env:
+          STM32_INDEX_URL: https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
+        run: |
+          arduino-cli core update-index --additional-urls "$STM32_INDEX_URL"
+          arduino-cli core install STMicroelectronics:stm32@3.0.0 --additional-urls "$STM32_INDEX_URL"
+
+      - name: Configure and compile every Balius sketch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sketches=(
+            flight_computer
+            power_board/bms
+            power_board/pwr
+            tests/power_board/bms/hello_world
+            tests/power_board/bms/pwr_serial_test
+            tests/power_board/bms/transistor_on
+            tests/power_board/pwr/bms_serial_test
+            tests/power_board/pwr/converters_on_test
+            tests/power_board/pwr/hello_world
+            tests/power_board/pwr/monitor_test
+          )
+
+          for sketch in "${sketches[@]}"; do
+            source_dir="RT_Arduino/Balius/$sketch"
+            build_dir="build/${sketch//\//_}"
+            echo "Configuring $source_dir"
+            cmake -S "$source_dir" -B "$build_dir" -G Ninja \
+              -DSTM32DUINO_CORE_PATH="$HOME/.arduino15/packages/STMicroelectronics/hardware/stm32/3.0.0" \
+              -DARDUINO_USER_LIBRARIES="${{ github.workspace }}/external"
+            cmake --build "$build_dir" --parallel 2
+          done

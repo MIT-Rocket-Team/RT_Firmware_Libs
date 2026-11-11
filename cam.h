@@ -7,14 +7,14 @@
 
 class cam {
     public:
-        cam(HardwareSerial* ser);
+        cam(Uart* ser);
         void begin();
         void getInfo();
         void writeString(char* data, uint8_t len, uint8_t x, uint8_t y);
         void writeChar(char data, uint8_t x, uint8_t y);
 
     private:
-        HardwareSerial* _ser;
+        Uart* _ser;
         uint8_t _crc(uint8_t *data, uint8_t len);
         uint8_t _crc8_dvb_s2(uint8_t crc, unsigned char a);
         void _sendFrame(uint8_t cmd, uint8_t *data, uint8_t len);

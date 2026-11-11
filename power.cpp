@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "power.h"
 
-power::power(HardwareSerial* pwrSer){
+power::power(Uart* pwrSer){
   _pwrSer = pwrSer;
 }
 

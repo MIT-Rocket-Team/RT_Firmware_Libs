@@ -4,7 +4,7 @@
 
 class power {
   public:
-    power(HardwareSerial* pwrSer);
+    power(Uart* pwrSer);
     void begin();
     void update();
     uint16_t getConverterVoltage(uint8_t converter);
@@ -18,7 +18,7 @@ class power {
     float getTemp();
 
   private:
-    HardwareSerial* _pwrSer;
+    Uart* _pwrSer;
     pwrBoardData _pkt;
     uint8_t _tmp[sizeof(_pkt)];
     uint8_t _calcChecksum(uint8_t* p);

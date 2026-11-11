@@ -53,7 +53,7 @@ typedef struct __attribute__((packed))
 
 class GPS {
   public:
-    GPS(HardwareSerial* gpsSer);
+    GPS(Uart* gpsSer);
     void begin();
     void update();
     float getMaxAlt();
@@ -93,7 +93,7 @@ class GPS {
 
 
   private:
-    HardwareSerial* _gpsSer;
+    Uart* _gpsSer;
     ubx_nav_pvt_t _pkt;
     uint8_t _buf[98];
     bool _headerValid;

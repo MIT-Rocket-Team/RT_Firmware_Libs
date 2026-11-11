@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "cam.h"
 
-cam::cam(HardwareSerial* ser) {
+cam::cam(Uart* ser) {
     _ser = ser;
 }
 
