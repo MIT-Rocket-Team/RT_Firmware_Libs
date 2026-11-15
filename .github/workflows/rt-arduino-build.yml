@@ -50,6 +50,10 @@ jobs:
 
           sketches=(
             flight_computer
+            tests/flight_computer/baro_test
+            tests/flight_computer/cc1200/SPI_test
+            tests/flight_computer/gps
+            tests/flight_computer/gps_forwarding
             power_board/bms
             power_board/pwr
             tests/power_board/bms/hello_world
