@@ -2,10 +2,11 @@
 #include "SPI.h"
 #include "CC1200.h"
 
-CC1200::CC1200(SPIClass* SPI, SPISettings settings, int cs) {
+CC1200::CC1200(SPIClass* SPI, SPISettings settings, int cs, int powerDet) {
     _SPI = SPI;
     _settings = settings;
     _cs = cs;
+    _powerDet = powerDet;
 }
 
 void CC1200::begin() {
@@ -75,6 +76,7 @@ byte CC1200::status() {
 
 void CC1200::simpleConfig() {
     _writeReg(0x0003, 0b01110011); //PA ON
+    _writeReg(0x002B, 0x33); //8 dBm output power
     //_writeReg(0x0001,0x06);
     //_writeReg(0x0001, 0b01110011); //LNA ON
     _writeReg(0x0004,0x6F);
@@ -175,6 +177,7 @@ bool CC1200::ready() {
 }
 
 void CC1200::sineWave() {
+    _writeReg(0x0003, 0b01110011); //PA ON
     _writeReg(0x2F05,0x01);
     _strobe(0x35);
 }
@@ -183,9 +186,22 @@ int8_t CC1200::rssi() {
     return _readReg(0x2F71);
 }
 
+float CC1200::rssiDBm() {
+    return rssi() - 81.0;
+}
+
 float CC1200::fullrssi() {
     int16_t rdg = (_readReg(0x2F71) << 8) + _readReg(0x2F72);
     return rdg / 256.0;
+}
+
+uint16_t CC1200::outputPowerRaw() {
+    return analogRead(_powerDet);
+}
+
+float CC1200::outputPowerDBm() {
+    float v = outputPowerRaw() * (3.3 / 1023.0);
+    return 16.4 * v + 3.45;
 }
 
 byte CC1200::partnum() {
