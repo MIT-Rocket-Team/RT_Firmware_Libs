@@ -1,22 +1,22 @@
 #include "Arduino.h"
-#include "BQ76922.h"
+#include "BQ76952.h"
 
-BQ76922::BQ76922(TwoWire* wire, byte adr) {
+BQ76952::BQ76952(TwoWire* wire, byte adr) {
     _Wire = wire;
     _adr = adr;
 }
 
-void BQ76922::begin() {
+void BQ76952::begin() {
     _Wire->begin();
 }
 
-void BQ76922::_writeByte(byte data) {
+void BQ76952::_writeByte(byte data) {
     _Wire->beginTransmission(_adr);
     _Wire->write(data);
     _Wire->endTransmission();
 }
 
-void BQ76922::_writeSubCmdAdr(uint16_t data, bool send) {
+void BQ76952::_writeSubCmdAdr(uint16_t data, bool send) {
     _Wire->beginTransmission(_adr);
     _Wire->write(0x3E);
     _Wire->write((byte) data);
@@ -26,7 +26,7 @@ void BQ76922::_writeSubCmdAdr(uint16_t data, bool send) {
     }
 }
 
-void BQ76922::_dirCmdR(byte cmd, byte len) {
+void BQ76952::_dirCmdR(byte cmd, byte len) {
     _Wire->beginTransmission(_adr);
     _Wire->write(cmd);
     _Wire->endTransmission(false);
@@ -34,9 +34,9 @@ void BQ76922::_dirCmdR(byte cmd, byte len) {
     _Wire->readBytes(_buf, len);
 }
 
-bool BQ76922::_subCmdR(unsigned int cmd) { //See page 13 TRM
+bool BQ76952::_subCmdR(unsigned int cmd) { //See page 13 TRM
     _writeSubCmdAdr(cmd, true); //1. Write lower byte of subcommand to 0x3E, 2. Write upper byte of subcommand to 0x3F.
-    
+
     bool complete = false;
     while(!complete) { //Continue reading 0x3E and 0x3F until it returns what was written originally
         _writeByte(0x3E);
@@ -52,7 +52,7 @@ bool BQ76922::_subCmdR(unsigned int cmd) { //See page 13 TRM
     _Wire->requestFrom(_adr, _bufLen);
     _Wire->readBytes(_buf, _bufLen);
     //6. Read the checksum at 0x60 and verify it matches the data read
-    byte checksum = (byte) cmd + (byte) (cmd >> 8); 
+    byte checksum = (byte) cmd + (byte) (cmd >> 8);
     for(int i = 0; i < _bufLen; i++) {
         checksum += _buf[i];
     }
@@ -63,7 +63,7 @@ bool BQ76922::_subCmdR(unsigned int cmd) { //See page 13 TRM
     return _Wire->read() == checksum;
 }
 
-void BQ76922::_subCmdW(unsigned int cmd, byte* data, byte len) {
+void BQ76952::_subCmdW(unsigned int cmd, byte* data, byte len) {
     byte checksum = (byte) cmd + (byte) (cmd >> 8);
     for(int i = 0; i < len; i++) {
         checksum += *(data + i);
@@ -79,7 +79,7 @@ void BQ76922::_subCmdW(unsigned int cmd, byte* data, byte len) {
     _Wire->endTransmission();
 }
 
-bool BQ76922::_writeMem(unsigned int cmd, byte* data, byte len) {
+bool BQ76952::_writeMem(unsigned int cmd, byte* data, byte len) {
     _subCmdW(cmd, data, len);
     /*Serial.println("HERE2");
     if(!_subCmdR(cmd)) {
@@ -104,7 +104,7 @@ bool BQ76922::_writeMem(unsigned int cmd, byte* data, byte len) {
 }
 
 
-void BQ76922::_subCmdWByte(uint16_t cmd, byte data) {
+void BQ76952::_subCmdWByte(uint16_t cmd, byte data) {
     byte checksum = (byte) cmd + (byte) (cmd >> 8);
     checksum += data;
     checksum = ~checksum;
@@ -118,7 +118,7 @@ void BQ76922::_subCmdWByte(uint16_t cmd, byte data) {
     _Wire->endTransmission();
 }
 
-void BQ76922::_subCmdWBytes(uint16_t cmd, uint16_t data) {
+void BQ76952::_subCmdWBytes(uint16_t cmd, uint16_t data) {
     byte checksum = (byte) cmd + (byte) (cmd >> 8);
     checksum += (byte) data + (byte) (data >> 8);
     checksum = ~checksum;
@@ -133,7 +133,7 @@ void BQ76922::_subCmdWBytes(uint16_t cmd, uint16_t data) {
     _Wire->endTransmission();
 }
 
-bool BQ76922::_writeMemByte(uint16_t adr, byte data) {
+bool BQ76952::_writeMemByte(uint16_t adr, byte data) {
     _subCmdWByte(adr, data);
     _subCmdR(adr);
     //to-do: verify write
@@ -141,20 +141,20 @@ bool BQ76922::_writeMemByte(uint16_t adr, byte data) {
 }
 
 
-bool BQ76922::_writeMemBytes(uint16_t adr, uint16_t data) {
+bool BQ76952::_writeMemBytes(uint16_t adr, uint16_t data) {
     _subCmdWBytes(adr, data);
     _subCmdR(adr);
     //to-do: verify write
     return true;
 }
 
-bool BQ76922::chargePumpEnable() {
+bool BQ76952::chargePumpEnable() {
     _writeMemByte(0x9309, 0x01);
     //to-do: verify write
     return true;
 }
 
-void BQ76922::enterConfigMode() {
+void BQ76952::enterConfigMode() {
     _writeSubCmdAdr(0x0090, true);
     while (1) {
         _dirCmdR(0x12, 2);
@@ -165,7 +165,7 @@ void BQ76922::enterConfigMode() {
     }
 }
 
-void BQ76922::exitConfigMode() {
+void BQ76952::exitConfigMode() {
     _writeSubCmdAdr(0x0092, true);
     while (1) {
         _dirCmdR(0x12, 2);
@@ -177,7 +177,7 @@ void BQ76922::exitConfigMode() {
 }
 
 
-bool BQ76922::disableProtections() {
+bool BQ76952::disableProtections() {
     _writeMemByte(0x9261, 0x00);
 
     /*if(_subCmdR(0x9261)) {
@@ -192,9 +192,9 @@ bool BQ76922::disableProtections() {
     return true;
 }
 
-bool BQ76922::enableFet() {
+bool BQ76952::enableFet() {
 
-    
+
     //_writeSubCmdAdr(0x0020, true);
     //_writeSubCmdAdr(0x0090, true);
     //delay(1000);
@@ -210,22 +210,22 @@ bool BQ76922::enableFet() {
     _writeSubCmdAdr(0x0092, true);*/
     _writeMemBytes(0x9308, 0x1C);
     _writeMemBytes(0x9343, 0x10);
-    
+
     //to-do: verify write
     return true;
 }
 
-byte BQ76922::fetStatus() {
+byte BQ76952::fetStatus() {
     _dirCmdR(0x7F, 1);
     return _buf[0];
 }
 
-uint16_t BQ76922::statusHex() {
+uint16_t BQ76952::statusHex() {
     _dirCmdR(0x12, 2);
     return (_buf[1] << 8) + _buf[0];
 }
 
-bool BQ76922::ddsgConfig(byte config) {
+bool BQ76952::ddsgConfig(byte config) {
     /*_writeSubCmdAdr(0x0090, true);
     delay(1000);
     _dirCmdR(0x12,2);
@@ -247,7 +247,7 @@ bool BQ76922::ddsgConfig(byte config) {
     return true;
 }
 
-bool BQ76922::dfetoffConfig(byte config) {
+bool BQ76952::dfetoffConfig(byte config) {
     /*_writeSubCmdAdr(0x0090, true);
     delay(1000);
     _writeMem(0x92FB, (byte*) &config, 1);
@@ -258,34 +258,34 @@ bool BQ76922::dfetoffConfig(byte config) {
     return true;
 }
 
-bool BQ76922::daConfig(byte config) { //0x0A: userV = mV, userA = cA, use die temp for cell temp protections
+bool BQ76952::daConfig(byte config) { //0x0A: userV = mV, userA = cA, use die temp for cell temp protections
     _writeMemByte(0x9303, config);
 
     //to-do: verify write
     return true;
 }
 
-int16_t BQ76922::cellVoltage(byte cell) {
+int16_t BQ76952::cellVoltage(byte cell) {
     _dirCmdR(0x14 + 2 * (cell - 1), 2);
     return (_buf[1] << 8) + _buf[0];
 }
 
-int16_t BQ76922::stackVoltage() {
+int16_t BQ76952::stackVoltage() {
     _dirCmdR(0x34, 2);
     return (_buf[1] << 8) + _buf[0];
 }
 
-int16_t BQ76922::current() {
+int16_t BQ76952::current() {
     _dirCmdR(0x3A, 2);
     return (_buf[1] << 8) + _buf[0];
 }
 
-float BQ76922::temp() {
+float BQ76952::temp() {
     _dirCmdR(0x68, 2);
     return (((_buf[1] << 8) + _buf[0]) / 10.0) - 273.15;
 }
 
-void BQ76922::fullAccess() {
+void BQ76952::fullAccess() {
     _Wire->beginTransmission(_adr);
     _Wire->write(0x3E);
     _Wire->write(0xFF);
@@ -298,12 +298,12 @@ void BQ76922::fullAccess() {
     _Wire->endTransmission();
 }
 
-bool BQ76922::OTPcheck() {
+bool BQ76952::OTPcheck() {
     _subCmdR(0x00A0);
     return _buf[0] & (1 << 7);
 }
 
-void BQ76922::OTPdebug() {
+void BQ76952::OTPdebug() {
     _subCmdR(0x00A0);
     if (_buf[0] & 1) {
         Serial.println("STACK VOLTAGE TOO HIGH");
@@ -320,10 +320,10 @@ void BQ76922::OTPdebug() {
     }
 }
 
-void BQ76922::statusReadout() {
+void BQ76952::statusReadout() {
     _dirCmdR(0x12, 2);
     uint16_t status = (_buf[1] << 8) + _buf[0];
-    
+
     if (status & 1) {
         Serial.println("Device is in CONFIG_UPDATE mode.");
     } else {
@@ -414,43 +414,45 @@ void BQ76922::statusReadout() {
 
 }
 
-bool BQ76922::fullAccessCheck() {
+bool BQ76952::fullAccessCheck() {
     _dirCmdR(0x12, 2);
     return (_buf[1] & 0x03) == 0x01;
 }
 
-bool BQ76922::writeOTP() {
+bool BQ76952::writeOTP() {
     _subCmdR(0x00A1);
     delay(1000);
     return _buf[0] == 0x80;
 }
 
-bool BQ76922::cellConfig(byte numCells) {
+bool BQ76952::cellConfig(byte numCells) {
     unsigned int config;
-    if(numCells == 3) {
-        config = 0x0013;
+    if(numCells == 12) { // 12 cells on Antenna Pointer
+        config = 0xF0FF; // changed from three cell config 0x0013 to twelve cell config
+        _writeMemBytes(0x9304, config);
+        // TODO: verify write
+        return true;
+    } else {
+        return false;
     }
-    _writeMemBytes(0x9304, config);
 
-    //to-do: verify write
-    return true;
 }
 
-bool BQ76922::cellUVOnly() {
+bool BQ76952::cellUVOnly() {
     _writeMemByte(0x9261, 0x04);
 
     //to-do: verify write
     return true;
 }
 
-bool BQ76922::cellUVandSC() {
+bool BQ76952::cellUVandSC() {
     _writeMemByte(0x9261, 0x84);
 
     //to-do: verify write
     return true;
 }
 
-bool BQ76922::cellSC20mV() {
+bool BQ76952::cellSC20mV() {
     _writeMemByte(0x9286, 0x01);
     _writeMemByte(0x9287, 31);
 
@@ -458,7 +460,7 @@ bool BQ76922::cellSC20mV() {
     return true;
 }
 
-bool BQ76922::minCellVoltage(float voltage) {
+bool BQ76952::minCellVoltage(float voltage) {
     byte setting = (voltage / .0506) + 1; //round up for safety
     _writeMemByte(0x9275, setting);
 
@@ -466,12 +468,12 @@ bool BQ76922::minCellVoltage(float voltage) {
     return true;
 }
 
-uint8_t BQ76922::safetyStatusA() {
+uint8_t BQ76952::safetyStatusA() {
     _dirCmdR(0x03, 1);
     return _buf[0];
 }
 
-uint8_t BQ76922::enabledProtectionsA() {
+uint8_t BQ76952::enabledProtectionsA() {
     _subCmdR(0x9261);
     return _buf[0];
 }

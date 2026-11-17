@@ -1,11 +1,14 @@
+#ifndef BQ76952_H
+#define BQ76952_H
+
 #include "Arduino.h"
 #include "Wire.h"
 
-#define DEFAULT_ADDR 0x08
+#define BQ76952_DEFAULT_ADDR 0x08
 
-class BQ76922 {
+class BQ76952 {
     public:
-        BQ76922(TwoWire* wire = &Wire, byte adr = DEFAULT_ADDR);
+        BQ76952(TwoWire* wire = &Wire, byte adr = BQ76952_DEFAULT_ADDR);
         void begin();
         int16_t cellVoltage(byte cell);
         int16_t stackVoltage();
@@ -52,3 +55,5 @@ class BQ76922 {
         bool _writeMemBytes(uint16_t adr, uint16_t data);
 
 };
+
+#endif // BQ76952_H
