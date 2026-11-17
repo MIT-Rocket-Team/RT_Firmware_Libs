@@ -1,4 +1,4 @@
-#include "BQ76942.h"
+#include "BQ76952.h"
 #include "Wire.h"
 
 BQ76952 bms(&Wire, 0x08);
