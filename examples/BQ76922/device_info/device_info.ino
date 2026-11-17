@@ -1,7 +1,7 @@
-#include "BQ76942.h"
+#include "BQ76952.h"
 #include "Wire.h"
 
-BQ76922 bms(&Wire, 0x08);
+BQ76952 bms(&Wire, 0x08);
 
 void setup() {
   // put your setup code here, to run once:
@@ -13,7 +13,7 @@ void setup() {
   bms.begin();
   delay(100);
   bms.enterConfigMode();
-  bms.cellConfig(3);
+  bms.cellConfig(12); // change to 12 to reflect 12-cell configuration on antenna pointer PCB
   bms.minCellVoltage();
   bms.cellUVOnly();
   //bms.disableProtections();
