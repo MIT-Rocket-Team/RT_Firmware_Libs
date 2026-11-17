@@ -5,7 +5,7 @@
 #ifdef USE_USB_SER
 #define GPS_SER Serial
 #else
-HardwareSerial GPS_SER(PA1, PA0);
+Uart GPS_SER(PA1, PA0);
 #endif
 
 GPS gps(&GPS_SER, 0);

@@ -8,6 +8,9 @@ BQ76922::BQ76922(TwoWire* wire, byte adr) {
 
 void BQ76922::begin() {
     _Wire->begin();
+    delay(100);
+    _Wire->beginTransmission(_adr);
+    _Wire->endTransmission();
 }
 
 void BQ76922::_writeByte(byte data) {

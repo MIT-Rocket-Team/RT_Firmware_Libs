@@ -1,12 +1,12 @@
 #include "Arduino.h"
 #include "SPI.h"
 
-#define C1 0xA579
-#define C2 0x953A
-#define C3 0x68AC
-#define C4 0x6305
-#define C5 0x8405
-#define C6 0x6D91
+#define C1 0x9946
+#define C2 0x921C
+#define C3 0x5FED
+#define C4 0x5B68
+#define C5 0x85CB
+#define C6 0x6C43
 
 #define MAVG_SAMPLES 20
 

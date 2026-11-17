@@ -6,7 +6,7 @@
 
 class CC1200 {
     public:
-        CC1200(SPIClass* SPI, SPISettings settings, int cs);
+        CC1200(SPIClass* SPI, SPISettings settings, int cs, int powerDet);
         void begin();
         byte status();
         void simpleConfig();
@@ -21,6 +21,9 @@ class CC1200 {
         void read(byte* buf, byte len);
         byte reset();
         int8_t rssi();
+        float rssiDBm();
+        uint16_t outputPowerRaw();
+        float outputPowerDBm();
         float fullrssi();
         void sineWave();
         void flushRx();
@@ -34,4 +37,5 @@ class CC1200 {
         byte _readReg(unsigned int reg);
         byte _strobe(byte cmd);
         int _cs;
+        int _powerDet;
 };

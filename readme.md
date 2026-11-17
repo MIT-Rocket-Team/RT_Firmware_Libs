@@ -33,7 +33,7 @@ returns z axis acceleration in m/s^2
 
 ### GPS library
 
-#### `GPS(HardwareSerial* gpsSer)`
+#### `GPS(Uart* gpsSer)`
 hardware serial constructor
 #### `GPS(USBSerial* gpsSer)`
 USB serial constructor

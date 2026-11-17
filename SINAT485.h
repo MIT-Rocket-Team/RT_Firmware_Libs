@@ -2,9 +2,9 @@
 
 class SINAT485 {
   public:
-    SINAT485(HardwareSerial* incloSer);
+    SINAT485(Uart* incloSer);
     void begin();
 
   private:
-    HardwareSerial* _incloSer;
+    Uart* _incloSer;
 };
